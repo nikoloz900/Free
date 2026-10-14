@@ -1,0 +1,2 @@
+import {NextResponse} from 'next/server';import {getAdmin} from '../../../../lib/auth';import {db} from '../../../../lib/db';
+export async function PATCH(req:Request){const a=await getAdmin();if(!a?.manageOrders)return NextResponse.json({error:'Forbidden'},{status:403});const {id,status}=await req.json();const allowed=['NEW','CONFIRMED','PREPARING','SHIPPED','DELIVERED','CANCELLED'];if(!allowed.includes(status))return NextResponse.json({error:'Bad status'},{status:400});return NextResponse.json(await db.order.update({where:{id:Number(id)},data:{status}}));}

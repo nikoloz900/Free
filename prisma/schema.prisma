@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  passwordHash   String
+  name           String   @default("Topuria Admin")
+  role           String   @default("OPERATOR")
+  active         Boolean  @default(true)
+  viewCost       Boolean  @default(false)
+  viewStatistics Boolean  @default(false)
+  manageUsers    Boolean  @default(false)
+  deleteProducts Boolean  @default(false)
+  manageOrders   Boolean  @default(true)
+  exportCsv      Boolean  @default(false)
+  manageCustomers Boolean @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Category {
+  id Int @id @default(autoincrement())
+  name String
+  slug String @unique
+  description String @default("")
+  active Boolean @default(true)
+  sortOrder Int @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String   @unique
+  sku       String   @unique
+  category  String
+  description String @default("")
+  imageUrl String @default("")
+  sizes String @default("")
+  colors String @default("")
+  price     Int
+  salePrice Int?
+  cost      Int      @default(0)
+  stock     Int      @default(0)
+  status    String   @default("ACTIVE")
+  views     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  items     OrderItem[]
+}
+
+model Order {
+  id           Int         @id @default(autoincrement())
+  orderNo      String      @unique
+  customerName String
+  phone        String
+  email        String?
+  address      String?
+  total        Int
+  status       String      @default("NEW")
+  source       String      @default("Website")
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  items        OrderItem[]
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  name      String
+  price     Int
+  cost      Int     @default(0)
+  quantity  Int     @default(1)
+  size      String?
+  color     String?
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model AnalyticsEvent {
+  id          Int      @id @default(autoincrement())
+  type        String
+  path        String?
+  productSlug String?
+  sessionId   String?
+  source      String?  @default("Direct")
+  device      String?  @default("Desktop")
+  value       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([type, createdAt])
+  @@index([productSlug, createdAt])
+  @@index([sessionId, createdAt])
+}

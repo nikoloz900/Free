@@ -1,0 +1,1 @@
+import {NextResponse} from 'next/server';import {db} from '../../../../lib/db';export async function POST(req:Request){const x=await req.json();await db.analyticsEvent.create({data:{type:x.type||'page_view',path:x.path||null,productSlug:x.productSlug||null,sessionId:x.sessionId||null}});return NextResponse.json({ok:true});}
