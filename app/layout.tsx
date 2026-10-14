@@ -1,8 +1,15 @@
 import './styles.css';
+import './v7.css';
 import type { Metadata } from 'next';
-import { Poppins } from 'next/font/google';
 import {StoreProvider} from './store';
 import {PreferencesProvider} from './preferences';
-const poppins=Poppins({subsets:['latin'],weight:['300','400','500','600','700','800'],display:'swap',variable:'--font-poppins'});
-export const metadata: Metadata={title:'Topuria Premium',description:'Premium women’s fashion in Georgia'};
-export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="ka"><body className={poppins.variable}><PreferencesProvider><StoreProvider>{children}</StoreProvider></PreferencesProvider></body></html>}
+import {CatalogProvider} from './catalog';
+import {getPublicCatalog} from '../lib/catalog';
+import {AnalyticsTracker} from './tracking';
+export const dynamic='force-dynamic';
+export const metadata: Metadata={title:{default:'Topuria Premium',template:'%s · Topuria Premium'},description:'Topuria Premium — თანამედროვე ქალის მოდა.'};
+export default async function RootLayout({children}:{children:React.ReactNode}){
+  let catalog:Awaited<ReturnType<typeof getPublicCatalog>>={products:[],categories:[]};let error='';
+  try{catalog=await getPublicCatalog()}catch{error='კატალოგი დროებით მიუწვდომელია. სცადეთ ხელახლა.'}
+  return <html lang="ka"><body><PreferencesProvider><CatalogProvider initial={catalog} error={error}><StoreProvider><AnalyticsTracker/>{children}</StoreProvider></CatalogProvider></PreferencesProvider></body></html>;
+}

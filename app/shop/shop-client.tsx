@@ -1,5 +1,24 @@
 'use client';
+import {useMemo,useState} from 'react';
+import {useSearchParams,useRouter} from 'next/navigation';
+import {SlidersHorizontal,X} from 'lucide-react';
+import {Header,Footer,ProductCard} from '../components';
+import {useCatalog,CatalogError} from '../catalog';
 import {usePreferences} from '../preferences';
-import {useMemo,useState} from 'react'; import {useSearchParams,useRouter} from 'next/navigation'; import {Header,ProductCard} from '../components'; import {products} from '../data'; import {SlidersHorizontal} from 'lucide-react';
-const labels:Record<string,string>={new:'სიახლეები',dresses:'კაბები',suits:'კოსტიუმები',plus:'პლუს ზომები',sale:'SALE'};
-export default function Shop(){const {t}=usePreferences();const [filter,setFilter]=useState(false);const sp=useSearchParams();const router=useRouter();const category=sp.get('category')||'all';const shown=useMemo(()=>category==='all'?products:products.filter(p=>p.categories.includes(category)),[category]);const go=(k:string)=>router.push(`/shop?category=${k}`);return <main><Header/><div className="shopTitle"><span>TOPURIA PREMIUM</span><h1>{category==='all'?t('catalog'):t((category in labels ? category : 'new') as 'new'|'dresses'|'suits'|'plus'|'sale')}</h1><p>{t('categoryDesc')}</p></div><div className="shopLayout"><aside className={filter?'show':''}><h3>{t('category')}</h3>{Object.entries(labels).map(([k,v])=><label key={k}><input type="radio" name="category" checked={category===k} onChange={()=>go(k)}/>{t(k as 'new'|'dresses'|'suits'|'plus'|'sale')}</label>)}<h3>{t('size')}</h3><div className="sizes">{['XS','S','M','L','XL','2XL'].map(x=><button key={x}>{x}</button>)}</div><h3>{t('color')}</h3><div className="swatches"><i/><i/><i/><i/></div><h3>{t('price')}</h3><input type="range"/></aside><section className="catalog"><div className="catalogBar"><b>{shown.length} {t('products')}</b><button onClick={()=>setFilter(!filter)}><SlidersHorizontal/> {t('filters')}</button><select defaultValue="new"><option value="new">{t('newCollection')}</option><option value="low">{t('low')}</option><option value="high">{t('high')}</option></select></div>{shown.length?<div className="productGrid three">{shown.map(p=><ProductCard key={p.slug} p={p}/>)}</div>:<div className="empty"><h2>{t('empty')}</h2><p>{t('emptyDesc')}</p></div>}</section></div></main>}
+export default function Shop(){
+  const {t}=usePreferences();const {products,categories,error}=useCatalog();const sp=useSearchParams();const router=useRouter();
+  const category=sp.get('category')||'all';const [filter,setFilter]=useState(false),[sort,setSort]=useState('new'),[size,setSize]=useState(''),[max,setMax]=useState(''),[inStock,setInStock]=useState(false);
+  const shown=useMemo(()=>{const rows=products.filter(p=>(category==='all'||category==='new'||p.categories.includes(category))&&(!size||p.sizes.includes(size))&&(!max||p.price<=Number(max))&&(!inStock||p.stock>0));return sort==='low'?rows.sort((a,b)=>a.price-b.price):sort==='high'?rows.sort((a,b)=>b.price-a.price):rows},[products,category,size,max,inStock,sort]);
+  const go=(k:string)=>{router.push('/shop?category='+encodeURIComponent(k));setFilter(false)};
+  const options=[{slug:'all',name:'ყველა პროდუქტი'},...categories,{slug:'sale',name:'SALE'}];
+  const sizes=[...new Set(products.flatMap(p=>p.sizes))];
+  return <main className="v7Store"><Header/><div className="shopTitle"><span>THE TOPURIA COLLECTION</span><h1>{category==='all'||category==='new'?t('newCollection'):category==='sale'?'SALE':categories.find(c=>c.slug===category)?.name||category}</h1></div><CatalogError/>
+  <div className="shopLayout"><aside className={filter?'show':''}><div className="filterHead"><h3>{t('category')}</h3><button aria-label="ფილტრების დახურვა" onClick={()=>setFilter(false)}><X/></button></div>
+    {options.map(c=><label key={c.slug}><input type="radio" name="category" checked={category===c.slug} onChange={()=>go(c.slug)}/>{c.name}</label>)}
+    {sizes.length>0&&<><h3>{t('size')}</h3><div className="sizes">{sizes.map(s=><button key={s} aria-pressed={size===s} className={size===s?'active':''} onClick={()=>setSize(size===s?'':s)}>{s}</button>)}</div></>}
+    <h3>მაქსიმალური ფასი ₾</h3><input aria-label="მაქსიმალური ფასი" type="number" min="0" value={max} onChange={e=>setMax(e.target.value)} className="priceInput"/>
+    <label><input type="checkbox" checked={inStock} onChange={e=>setInStock(e.target.checked)}/>მარაგშია</label><button className="resetFilters" onClick={()=>{setSize('');setMax('');setInStock(false);setSort('new');go('all')}}>ფილტრების გასუფთავება</button>
+  </aside><section className="catalog"><div className="catalogBar"><span>{shown.length} {t('products')}</span><button aria-expanded={filter} onClick={()=>setFilter(!filter)}><SlidersHorizontal size={16}/>{t('filters')}</button><select aria-label="სორტირება" value={sort} onChange={e=>setSort(e.target.value)}><option value="new">ახლახან დამატებული</option><option value="low">{t('low')}</option><option value="high">{t('high')}</option></select></div>
+    {shown.length?<div className="productGrid three">{shown.map(p=><ProductCard key={p.slug} p={p}/>)}</div>:!error?<div className="empty"><h2>{t('empty')}</h2><p>სცადე სხვა კატეგორია ან ფილტრი.</p></div>:null}
+  </section></div><Footer/></main>;
+}
