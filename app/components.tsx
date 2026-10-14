@@ -40,7 +40,7 @@ export function ProductVisual({imageUrl,alt='',tall=false,tone='burgundy',priori
   // Stored HTTPS URLs can include Cloudinary and existing hosts; never invent product imagery.
   const optimized=imageUrl?.startsWith('/')&&!imageUrl.startsWith('//')||imageUrl?.startsWith('https://res.cloudinary.com/');
   return <div className={'fashion '+tone+(tall?' tall':'')}>{imageUrl&&!failed?
-    optimized?<Image src={imageUrl} alt={alt} fill sizes={tall?'(max-width: 680px) 100vw, 56vw':'(max-width: 680px) 50vw, (max-width: 950px) 33vw, 25vw'} preload={priority} onError={()=>setFailed(true)}/>:
+    optimized?<Image src={imageUrl} alt={alt} fill sizes={tall?'(max-width: 680px) 100vw, 56vw':'(max-width: 680px) 50vw, (max-width: 1100px) 33vw, (max-width: 1320px) 25vw, 300px'} preload={priority} onError={()=>setFailed(true)}/>:
     <img src={imageUrl} alt={alt} loading={priority?'eager':'lazy'} fetchPriority={priority?'high':'auto'} onError={()=>setFailed(true)}/>:
 
     <div className="imagePlaceholder"><span>TP</span><small>ფოტო მალე დაემატება</small></div>}</div>;

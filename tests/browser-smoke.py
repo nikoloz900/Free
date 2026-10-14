@@ -1,5 +1,9 @@
 """Browser checks against disposable local validation data; never runs against a remote site."""
 import os
+from email.parser import BytesParser
+from email.policy import default
+from PIL import Image, ImageDraw
+from io import BytesIO
 from pathlib import Path
 from urllib.parse import urlparse
 from playwright.sync_api import sync_playwright
@@ -36,10 +40,36 @@ with sync_playwright() as playwright:
     editor=page.locator('.productEditorDialog')
     editor.get_by_label('ფასი ₾',exact=True).fill('270')
     editor.get_by_label('მარაგი',exact=True).fill('7')
-    page.route('https://api.cloudinary.com/**',lambda route:route.fulfill(status=200,content_type='application/json',body='{"secure_url":"https://res.cloudinary.com/v7-test/image/upload/photo.png"}'))
+    upload_checks=[]
+    source_size=[Path('/workspace/Free/public/brand/logo-white.png').stat().st_size]
+    def verify_upload(route):
+        content_type=route.request.headers['content-type']
+        message=BytesParser(policy=default).parsebytes(('Content-Type: '+content_type+'\r\nMIME-Version: 1.0\r\n\r\n').encode()+route.request.post_data_buffer)
+        part=next(p for p in message.iter_parts() if p.get_param('name',header='content-disposition')=='file')
+        content=part.get_payload(decode=True)
+        original=source_size[0]
+        image=Image.open(BytesIO(content))
+        assert len(content)<original, 'Upload file was not reduced'
+        assert max(image.size)<=1600, 'Upload dimensions were not reduced'
+        assert part.get_content_type()=='image/webp'
+        upload_checks.append({'before':original,'after':len(content),'dimensions':image.size})
+        route.fulfill(status=200,content_type='application/json',body='{"secure_url":"https://res.cloudinary.com/v7-test/image/upload/photo.png"}')
+    page.route('https://api.cloudinary.com/**',verify_upload)
     page.route('**/_next/image**',lambda route:route.continue_())
     editor.get_by_label('პროდუქტის ფოტოს ატვირთვა').set_input_files('/workspace/Free/public/brand/logo-white.png')
     editor.get_by_role('status').filter(has_text='ფოტო აიტვირთა').wait_for()
+    assert len(upload_checks)==1
+    print('Image upload optimization:',upload_checks[0])
+    large=Image.new('RGB',(3200,2400));draw=ImageDraw.Draw(large)
+    for x in range(0,3200,40):
+        for y in range(0,2400,40):draw.rectangle((x,y,x+39,y+39),fill=(x%255,y%255,(x+y)%255))
+    encoded=BytesIO();large.save(encoded,format='JPEG',quality=95);payload=encoded.getvalue();source_size[0]=len(payload)
+    with page.expect_response(lambda response:'api.cloudinary.com' in response.url):
+        editor.get_by_label('პროდუქტის ფოტოს ატვირთვა').set_input_files({'name':'large-test.jpg','mimeType':'image/jpeg','buffer':payload})
+    editor.get_by_role('status').filter(has_text='ფოტო აიტვირთა').wait_for()
+    assert len(upload_checks)==2 and upload_checks[1]['dimensions']==(1600,1200)
+    print('Large image resize:',upload_checks[1])
+
     editor.get_by_text('ფოტოს ბმული',exact=True).click()
     editor.get_by_label('ფოტოს HTTPS ბმული').fill('/brand/logo-white.png')
     editor.get_by_role('button',name='პროდუქტის შენახვა',exact=True).click()
@@ -58,6 +88,8 @@ with sync_playwright() as playwright:
     assert page.evaluate("id=>fetch('/api/admin/products?id='+id,{method:'DELETE'}).then(r=>r.status)",created['id'])==200
     page.goto(base+'/shop')
     page.locator('.productCard').first.wait_for()
+    card_width=page.locator('.productImg').first.evaluate('(e)=>e.getBoundingClientRect().width')
+    assert card_width<=310, 'Desktop product image still too large'
     assert page.locator('.productCard').count() == 2
     page.get_by_label('სორტირება').select_option('high')
     assert 'მეორე მოდელი' in page.locator('.productCard').first.inner_text()
