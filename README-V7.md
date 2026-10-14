@@ -80,7 +80,8 @@ AUTH_SECRET-ის ცვლილება არსებულ სესი�
    არ შექმნა სატესტო შეკვეთები production ბაზაში მხოლოდ შემოწმების გამო.
 
 `vercel.json` საჭირო არ არის. Vercel Next.js-ს ავტომატურად მართავს.
-ამ სამუშაოს დროს Vercel deploy და GitHub push არ შესრულებულა.
+V7 ატვირთულია GitHub-ის `codex/topuria-v7` branch-ზე. Vercel deploy ჯერ არ შესრულებულა.
+`main`-ზე გადასატანად GitHub-ში შეადარე branch-ები და შექმენი pull request; ცვლილებების განხილვის შემდეგ შეგიძლია merge.
 
 ## ლოკალური გაშვება
 
