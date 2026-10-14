@@ -1,0 +1,42 @@
+{
+  "name": "topuria-premium-v6",
+  "version": "6.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "db:push": "prisma db push",
+    "db:seed": "prisma db seed",
+    "setup": "prisma generate && prisma db push && prisma db seed",
+    "db:prod:generate": "prisma generate",
+    "db:prod:push": "prisma db push",
+    "db:generate": "prisma generate",
+    "db:deploy": "prisma migrate deploy",
+    "db:dev:sqlite": "prisma db push --schema prisma/schema.sqlite.prisma",
+    "db:studio": "prisma studio",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "next": "^16.3.8",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "lucide-react": "0.468.0",
+    "@prisma/client": "6.16.3",
+    "bcryptjs": "3.0.2",
+    "jose": "6.1.0",
+    "cloudinary": "^2.5.1",
+    "next-cloudinary": "^6.16.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "@types/node": "24.7.2",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "prisma": "6.16.3",
+    "tsx": "4.20.6"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
+}
