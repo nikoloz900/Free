@@ -13,7 +13,7 @@ export default function ProductClient({product:p,related}:{product:Product;relat
   const available=Math.max(0,p.stock-cart.filter(i=>i.slug===p.slug).reduce((s,i)=>s+i.qty,0));
   useEffect(()=>{track('product_view',p.slug)},[p.slug]);
   useEffect(()=>{if(!added)return;const id=setTimeout(()=>setAdded(false),1800);return()=>clearTimeout(id)},[added]);
-  return <main className="v7Store"><Header/><div className="productBreadcrumb"><Link href="/shop"><ArrowLeft size={14}/>კოლექცია</Link><span>/ {p.categoryName}</span></div><div className="productPage">
+  return <main className="v7Store directCatalog"><Header/><div className="productBreadcrumb"><Link href="/shop"><ArrowLeft size={14}/>კოლექცია</Link><span>/ {p.categoryName}</span></div><div className="productPage">
     <div className="gallery"><ProductVisual imageUrl={p.imageUrl} alt={p.name} tall priority/></div>
     <div className="details"><span className="eyebrow">{p.categoryName}</span><h1>{p.name}</h1><h2>{p.oldPrice!==undefined&&<del>₾{p.oldPrice}</del>} {money(p.price)}</h2><p className="availability">{p.stock>0?'მარაგშია · '+p.stock+' ც.':'მარაგი ამოწურულია'}</p>
       {p.description&&<p className="muted">{p.description}</p>}

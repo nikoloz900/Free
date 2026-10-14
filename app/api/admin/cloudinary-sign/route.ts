@@ -5,11 +5,11 @@ import {getAdmin} from '../../../../lib/auth';
 
 export async function POST(request:Request){const blocked=rejectCrossOrigin(request);if(blocked)return blocked;
   const admin=await getAdmin();
-  if(!admin)return NextResponse.json({error:'Unauthorized'},{status:401});
+  if(!admin)return NextResponse.json({error:'ადმინის სესია დასრულდა. შედით ხელახლა.'},{status:401});
   const apiSecret=process.env.CLOUDINARY_API_SECRET;
   const apiKey=process.env.CLOUDINARY_API_KEY;
   const cloudName=process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-  if(!apiSecret||!apiKey||!cloudName)return NextResponse.json({error:'Cloudinary configuration missing'},{status:503});
+  if(!apiSecret||!apiKey||!cloudName)return NextResponse.json({error:'Cloudinary-ის კონფიგურაცია არასრულია. შეამოწმეთ გარემოს ცვლადები Vercel-ში.'},{status:503});
   try{
     const body=await request.json();
     const params=body?.paramsToSign;
@@ -20,8 +20,8 @@ export async function POST(request:Request){const blocked=rejectCrossOrigin(requ
     if(Object.keys(params).some(k=>!allowed.has(k)))return NextResponse.json({error:'Unsupported upload parameter'},{status:400});
     if(params.folder!==undefined&&params.folder!=='topuria-premium/products')return NextResponse.json({error:'Invalid folder'},{status:400});
     const timestamp=Number(params.timestamp);
-    if(!Number.isFinite(timestamp)||Math.abs(Math.floor(Date.now()/1000)-timestamp)>300)return NextResponse.json({error:'Expired upload request'},{status:400});
+    if(!Number.isFinite(timestamp)||Math.abs(Math.floor(Date.now()/1000)-timestamp)>300)return NextResponse.json({error:'ატვირთვის მოთხოვნის დრო ამოიწურა. სცადეთ ხელახლა.'},{status:400});
     const signature=cloudinary.utils.api_sign_request(params,apiSecret);
     return NextResponse.json({signature});
-  }catch{return NextResponse.json({error:'Could not sign upload'},{status:400});}
+  }catch{return NextResponse.json({error:'ფოტოს ატვირთვის მომზადება ვერ შესრულდა.'},{status:400});}
 }
