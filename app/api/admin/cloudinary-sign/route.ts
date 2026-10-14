@@ -1,8 +1,9 @@
+import {rejectCrossOrigin} from '../../../../lib/request';
 import {NextResponse} from 'next/server';
 import {v2 as cloudinary} from 'cloudinary';
 import {getAdmin} from '../../../../lib/auth';
 
-export async function POST(request:Request){
+export async function POST(request:Request){const blocked=rejectCrossOrigin(request);if(blocked)return blocked;
   const admin=await getAdmin();
   if(!admin)return NextResponse.json({error:'Unauthorized'},{status:401});
   const apiSecret=process.env.CLOUDINARY_API_SECRET;

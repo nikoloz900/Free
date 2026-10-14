@@ -1,18 +1,24 @@
 'use client';
-import {usePreferences} from './preferences';
 import Link from 'next/link';
-import Image from 'next/image';
-import {ArrowRight,Instagram,Play,ChevronRight} from 'lucide-react';
-import {Header,ProductCard,Benefits,ProductVisual} from './components';
-import {products} from './data';
-export default function Home(){const {t}=usePreferences();return <main><Header/>
-<section className="hero heroV21"><div className="heroGlow"/><div className="heroCopy"><span className="eyebrow">{t('heroTag')}</span><h1>{t('heroTitle')}<br/><span>{t('heroAccent')}</span></h1><p>{t('heroDesc')}</p><div className="heroCtas"><Link href="/shop" className="btn btnBig">{t('newCollection')} <ArrowRight/></Link><Link href="/shop" className="textCta">{t('catalog')} <ChevronRight/></Link></div></div><div className="heroFashion"><ProductVisual tone="burgundy" tall/></div><div className="heroBadge"><span>NEW</span><b>2026</b><small>COLLECTION</small></div><div className="heroNumber">01 <span/> 03</div></section>
-<section className="trustStrip"><span>PREMIUM QUALITY</span><i/> <span>NEW COLLECTION</span><i/> <span>DELIVERY ACROSS GEORGIA</span><i/> <span>TOPURIA PREMIUM</span></section>
-<section className="categoryWrap"><div className="sectionIntro"><span>{t('categoryTag')}</span><h2>{t('categoryTitle')}</h2><p>{t('categoryDesc')}</p></div><div className="categories categoriesV21"><Category title="კაბები" subtitle="DRESSES" tone="burgundy"/><Category title="კოსტიუმები" subtitle="SUITS" tone="mocha"/><Category title="პლუს ზომები" subtitle="PLUS SIZE" tone="black"/><Category title="აქსესუარები" subtitle="ACCESSORIES" tone="ivory"/></div></section>
-<section className="collection"><div className="sectionHead"><div><span>{t('justLanded')}</span><h2>{t('newCollection')}</h2><p>ახალი სეზონის რჩეული მოდელები</p></div><Link href="/shop">{t('all')} <ArrowRight/></Link></div><div className="productGrid">{products.map(p=><ProductCard key={p.slug} p={p}/>)}</div></section>
-<section className="editorial editorialV21"><div className="editorialCopy"><span>THE TOPURIA EDIT</span><h2>{t('editorialTitle')}</h2><p>{t('editorialDesc')}</p><Link href="/shop" className="btn btnBig light">SHOP THE LOOK <ArrowRight/></Link></div><div className="editorialVisual"><ProductVisual tone="burgundy" tall/><button className="play"><Play fill="currentColor"/></button></div></section>
-<section className="brandStory"><div className="storyLogo"><Image src="/brand/topuria-burgundy-original.png" alt="Topuria Premium" fill sizes="500px" style={{objectFit:'cover'}}/></div><div className="storyCopy"><span>TOPURIA PREMIUM</span><h2>{t('brandTitle')}</h2><p>{t('brandDesc')}</p><Link href="/shop">აღმოაჩინე კოლექცია <ArrowRight/></Link></div></section>
-<section className="instagram"><Instagram/><span>@topuria.premium</span><h2>Follow our <b>style.</b></h2><p>ახალი მოდელები, ლუქები და Topuria Premium-ის ყოველდღიური ამბები.</p><div className="instaGrid">{['burgundy','black','ivory','mocha','burgundy'].map((x,i)=><div className="instaTile" key={i}><ProductVisual tone={x}/><div className="instaHover"><Instagram/><span>View post</span></div></div>)}</div></section>
-<section className="newsletter"><span>BE FIRST TO KNOW</span><h2>{t('newsletter')}</h2><p>{t('newsletterDesc')}</p><div><input placeholder={t('email')}/><button>{t('subscribe')} <ArrowRight/></button></div></section>
-<Benefits/><footer><div className="footerBrand">♕<b>TOPURIA</b><span>PREMIUM</span><p>ქალის პრემიუმ ტანსაცმელი თბილისში.</p></div><div><b>{t('store')}</b><a>ვიქტორ დოლიძის 10, თბილისი</a><a>ყოველდღე 11:00–20:00</a></div><div><b>{t('help')}</b><a>{t('delivery')}</a><a>{t('returns')}</a><a>{t('contact')}</a></div><div><b>{t('about')}</b><a>Facebook</a><a>Instagram</a></div></footer></main>}
-function Category({title,subtitle,tone}:{title:string,subtitle:string,tone:string}){const {t}=usePreferences();const translated=title==='კაბები'?t('dresses'):title==='კოსტიუმები'?t('suits'):title==='პლუს ზომები'?t('plus'):title;return <Link href="/shop" className="cat"><ProductVisual tone={tone}/><div><small>{subtitle}</small><h3>{translated}</h3><span>{t('discover')} <ArrowRight/></span></div></Link>}
+import {ArrowRight,ArrowUpRight} from 'lucide-react';
+import {usePreferences} from './preferences';
+import {Header,Footer,ProductCard,Benefits,ProductVisual} from './components';
+import {useCatalog,CatalogError} from './catalog';
+export default function Home(){
+  const {t}=usePreferences();const {products,categories,error}=useCatalog();
+  const hero=products.find(p=>p.imageUrl);const second=products.find(p=>p.imageUrl&&p.slug!==hero?.slug)||hero;
+  return <main className="v7Store"><Header/>
+    <section className="v7Hero"><div className="v7HeroCopy"><span className="eyebrow">THE TOPURIA EDIT</span><h1>{t('heroTitle')}<br/><em>{t('heroAccent')}</em></h1><Link href="/shop" className="v7Link">{t('newCollection')} <ArrowUpRight size={19}/></Link><span className="heroIndex">01 — თანამედროვე კლასიკა</span></div>
+      <div className="v7HeroImage"><ProductVisual imageUrl={hero?.imageUrl} alt={hero?.name||'Topuria Premium'} priority tall/>
+      {hero&&<Link href={'/product/'+hero.slug} className="heroCaption"><span>{hero.name}</span><ArrowUpRight size={20}/></Link>}</div>
+    </section>
+    <div className="v7Manifesto"><span>ნაკლები სიტყვა.</span><span>მეტი ხასიათი.</span><span>TOPURIA PREMIUM</span></div>
+    <CatalogError/>
+    <section className="collection"><div className="sectionHead"><div><span>THE NEW COLLECTION</span><h2>{t('newCollection')}</h2></div><Link href="/shop">{t('all')} <ArrowRight/></Link></div>
+      {products.length?<div className="productGrid">{products.slice(0,4).map(p=><ProductCard key={p.slug} p={p}/>)}</div>:!error?<div className="empty"><p>კოლექცია მალე დაემატება.</p></div>:null}
+    </section>
+    {categories.length>0&&<section className="v7Collections"><div className="sectionHead"><div><span>CURATED BY TOPURIA</span><h2>შენი არჩევანი</h2></div></div><div className="v7CategoryGrid">{categories.slice(0,3).map((c,i)=><Link key={c.slug} href={'/shop?category='+encodeURIComponent(c.slug)}><ProductVisual imageUrl={products.find(p=>p.category===c.slug&&p.imageUrl)?.imageUrl} alt={c.name}/><div><span>0{i+1}</span><h3>{c.name}</h3><ArrowUpRight/></div></Link>)}</div></section>}
+    <section className="v7Editorial"><div><span className="eyebrow">A QUIET STATEMENT</span><h2>სტილი,<br/>რომელიც რჩება.</h2><Link href="/shop" className="v7Link">აღმოაჩინე კოლექცია <ArrowUpRight size={18}/></Link></div><ProductVisual imageUrl={second?.imageUrl} alt={second?.name||'Topuria Premium'} tall/></section>
+    <Benefits/><Footer/>
+  </main>;
+}

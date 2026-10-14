@@ -1,6 +1,6 @@
 {
-  "name": "topuria-premium-v6",
-  "version": "6.0.0",
+  "name": "topuria-premium-v7",
+  "version": "7.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,14 +8,16 @@
     "start": "next start",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
-    "setup": "prisma generate && prisma db push && prisma db seed",
+    "setup": "prisma generate",
     "db:prod:generate": "prisma generate",
     "db:prod:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:deploy": "prisma migrate deploy",
     "db:dev:sqlite": "prisma db push --schema prisma/schema.sqlite.prisma",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test:integration": "tsx --test tests/integration.test.ts"
   },
   "dependencies": {
     "next": "^16.3.8",
@@ -38,5 +40,14 @@
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
+  },
+  "engines": {
+    "node": "24.x"
+  },
+  "overrides": {
+    "@prisma/config": {
+      "deepmerge-ts": "8.0.0",
+      "effect": "3.20.0"
+    }
   }
 }
