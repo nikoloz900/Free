@@ -16,7 +16,7 @@ export function Header(){
   useEffect(()=>setOpen(false),[pathname]);
   useEffect(()=>{if(!open)return;const close=(e:KeyboardEvent)=>{if(e.key==='Escape')setOpen(false)};
     document.addEventListener('keydown',close);return()=>document.removeEventListener('keydown',close)},[open]);
-  return <><div className="announcement">TOPURIA PREMIUM <span>·</span> თანამედროვე ქალის მოდა</div>
+  return <>
     <header className="header">
       <button aria-label={t('menu')} aria-expanded={open} aria-controls="store-menu" className="icon mobile" onClick={()=>setOpen(true)}><Menu/></button>
       <Link href="/" className="brand" aria-label="Topuria Premium — მთავარი"><b>TOPURIA</b><small>PREMIUM</small></Link>
@@ -31,7 +31,7 @@ export function Header(){
       <button autoFocus aria-label="დახურვა" onClick={()=>setOpen(false)}><X/></button>
       {nav.map(n=><Link onClick={()=>setOpen(false)} key={n.href} href={n.href}>{n.name}<ArrowRight/></Link>)}
       <Link href="/wishlist">{t('wishlist')}<Heart/></Link><Link href="/account">{t('account')}<User/></Link>
-      <label className="mobileTheme">თემა<select aria-label="მაღაზიის თემა" value={theme} onChange={e=>setTheme(e.target.value as typeof theme)}><option value="burgundy">ბორდო</option><option value="light">ნათელი</option><option value="dark">მუქი</option></select></label>
+      <label className="mobileTheme">ენა<select aria-label="ენა" value={lang} onChange={e=>setLang(e.target.value as typeof lang)}><option value="ka">ქართული</option><option value="en">English</option><option value="ru">Русский</option></select></label><label className="mobileTheme">თემა<select aria-label="მაღაზიის თემა" value={theme} onChange={e=>setTheme(e.target.value as typeof theme)}><option value="burgundy">ბორდო</option><option value="light">ნათელი</option><option value="dark">მუქი</option></select></label>
     </div></>}
   </>;
 }

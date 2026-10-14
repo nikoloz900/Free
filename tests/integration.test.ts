@@ -55,6 +55,8 @@ test('Product edits are immediately visible; draft and hidden products stay priv
   const p=await (await request('/api/catalog')).json();assert.equal(p.products[0].price,200);assert.equal(p.products[0].stock,2);
   assert.equal((await request('/api/admin/products','POST',{...form,id:undefined,slug:'v7-test-draft',sku:'V7-DRAFT',status:'DRAFT'},ownerCookie)).status,201);
   await db.product.create({data:{name:'Hidden fixture',slug:'v7-test-hidden',sku:'V7-HIDDEN',category:'v7-test-hidden',price:10,status:'ACTIVE'}});
+  assert.equal((await request('/api/admin/products','PATCH',{id:activeId,stock:6},ownerCookie)).status,200);
+  assert.equal((await db.product.findUniqueOrThrow({where:{id:activeId}})).stock,6);
   const hidden=await (await request('/api/catalog')).json();assert.equal(hidden.products.length,1);assert.equal(hidden.categories.some((c:{slug:string})=>c.slug==='v7-test-hidden'),false);
   assert.equal((await request('/product/v7-test-draft')).status,404);
 });
@@ -80,6 +82,29 @@ test('Permissions, origin checks, validation and password hashes stay protected'
   assert.equal(await db.analyticsEvent.count(),1);
 
 });
+test('Category editing preserves product links and partial toggles preserve category data',async()=>{
+  const c=await db.category.findUniqueOrThrow({where:{slug:'v7-test-dresses'}});
+  const edited=await request('/api/admin/categories','PATCH',{id:c.id,name:'Updated category',description:'Edited description',sortOrder:5},ownerCookie);
+  assert.equal(edited.status,200);assert.equal((await edited.json()).description,'Edited description');
+  const catalog=await (await request('/api/catalog')).json();assert.equal(catalog.products[0].categoryName,'Updated category');
+  assert.equal((await request('/api/admin/categories','PATCH',{id:c.id,active:false},ownerCookie)).status,200);
+  const stored=await db.category.findUniqueOrThrow({where:{id:c.id}});assert.equal(stored.name,'Updated category');assert.equal(stored.sortOrder,5);
+  assert.equal((await (await request('/api/catalog')).json()).products.length,0);
+  assert.equal((await request('/api/admin/categories','PATCH',{id:c.id,active:true},ownerCookie)).status,200);
+  assert.equal((await request('/api/admin/categories','PATCH',{id:c.id,slug:'break-product-links'},ownerCookie)).status,400);
+  assert.equal((await request('/api/admin/categories?id='+c.id,'DELETE',undefined,ownerCookie)).status,409);
+});
+test('Operator creation and profile editing preserve existing password hashes unless explicitly changed',async()=>{
+  const created=await request('/api/admin/users','POST',{name:'New test operator',email:'new@v7.test',password:'temporary-validation-password'},ownerCookie);
+  assert.equal(created.status,201);const user=await created.json();assert.equal(user.role,'OPERATOR');assert.equal('passwordHash' in user,false);
+  const before=await db.adminUser.findUniqueOrThrow({where:{id:user.id}});
+  assert.equal((await request('/api/admin/users','PATCH',{id:user.id,name:'Edited operator',email:'edited@v7.test',password:''},ownerCookie)).status,200);
+  const after=await db.adminUser.findUniqueOrThrow({where:{id:user.id}});assert.equal(after.passwordHash,before.passwordHash);assert.equal(after.email,'edited@v7.test');
+  const login=await request('/api/admin/login','POST',{email:'edited@v7.test',password:'temporary-validation-password'});assert.equal(login.status,200);
+  const owner=await db.adminUser.findUniqueOrThrow({where:{email:'owner@v7.test'}});
+  assert.equal((await request('/api/admin/users','PATCH',{id:owner.id,key:'active',value:false},ownerCookie)).status,400);
+  assert.equal((await request('/api/admin/users','POST',{name:'Duplicate',email:'edited@v7.test',password:'temporary-validation-password'},ownerCookie)).status,409);
+});
 test('Analytics revenue excludes cancelled and unfulfilled orders, uses stored events',async()=>{
   const today=new Date();today.setUTCHours(12,0,0,0);
   for(const [orderNo,status,total] of [['V7-DELIVERED','DELIVERED',200],['V7-CANCELLED','CANCELLED',999],['V7-NEW','NEW',300]] as const){
@@ -94,4 +119,9 @@ test('Analytics revenue excludes cancelled and unfulfilled orders, uses stored e
     const r=await request(path,'GET',undefined,ownerCookie);assert.equal(r.status,200,path);
   }
   assert.equal((await request('/api/admin/products?id='+activeId,'DELETE',undefined,ownerCookie)).status,409);
+  const order=await db.order.findUniqueOrThrow({where:{orderNo:'V7-DELIVERED'}});
+  const updated=await request('/api/admin/orders','PATCH',{id:order.id,customerName:'Edited customer',phone:'test-updated',email:'customer@v7.test',address:'Test address'},ownerCookie);
+  assert.equal(updated.status,200);assert.equal((await updated.json()).address,'Test address');
+  const stored=await db.order.findUniqueOrThrow({where:{id:order.id},include:{items:true}});assert.equal(stored.total,200);assert.equal(stored.status,'DELIVERED');assert.equal(stored.items.length,1);
+
 });
