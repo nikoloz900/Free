@@ -7,15 +7,21 @@ import {useStore} from '../../store';
 import {track} from '../../tracking';
 import type {Product} from '../../data';
 import {money} from '../../../lib/format';
+import {useCatalog} from '../../catalog';
+import {usePreferences} from '../../preferences';
+import {translateCategoryName,translateProductName} from '../../../lib/category-labels';
 export default function ProductClient({product:p,related}:{product:Product;related:Product[]}){
   const [size,setSize]=useState(p.sizes[0]||''),[q,setQ]=useState(1),[added,setAdded]=useState(false);
   const {add,wishlist,toggleWish,cart}=useStore();const liked=wishlist.includes(p.slug);
+  const {categories}=useCatalog();const {lang,t}=usePreferences();
+  const categoryName=categories.find(c=>c.slug===p.category)?.name||translateCategoryName(p.categoryName,lang);
+  const productName=translateProductName(p.name,lang);
   const available=Math.max(0,p.stock-cart.filter(i=>i.slug===p.slug).reduce((s,i)=>s+i.qty,0));
   useEffect(()=>{track('product_view',p.slug)},[p.slug]);
   useEffect(()=>{if(!added)return;const id=setTimeout(()=>setAdded(false),1800);return()=>clearTimeout(id)},[added]);
-  return <main className="v7Store directCatalog"><Header/><div className="productBreadcrumb"><Link href="/shop"><ArrowLeft size={14}/>კოლექცია</Link><span>/ {p.categoryName}</span></div><div className="productPage">
-    <div className="gallery"><ProductVisual imageUrl={p.imageUrl} alt={p.name} tall priority/></div>
-    <div className="details"><span className="eyebrow">{p.categoryName}</span><h1>{p.name}</h1><h2>{p.oldPrice!==undefined&&<del>₾{p.oldPrice}</del>} {money(p.price)}</h2><p className="availability">{p.stock>0?'მარაგშია · '+p.stock+' ც.':'მარაგი ამოწურულია'}</p>
+  return <main className="v7Store directCatalog"><Header/><div className="productBreadcrumb"><Link href="/shop"><ArrowLeft size={14}/>{t('collections')}</Link><span>/ {categoryName}</span></div><div className="productPage">
+    <div className="gallery"><ProductVisual imageUrl={p.imageUrl} alt={productName} tall priority/></div>
+    <div className="details"><span className="eyebrow">{categoryName}</span><h1>{productName}</h1><h2>{p.oldPrice!==undefined&&<del>₾{p.oldPrice}</del>} {money(p.price)}</h2><p className="availability">{p.stock>0?'მარაგშია · '+p.stock+' ც.':'მარაგი ამოწურულია'}</p>
       {p.description&&<p className="muted">{p.description}</p>}
       {p.colors.length>0&&<div className="productColors"><b>ფერი</b><p>{p.colors.join(' · ')}</p></div>}
       {p.sizes.length>0&&<><div className="sizeHead"><b>ზომა</b></div><div className="sizes big">{p.sizes.map(x=><button aria-pressed={size===x} className={size===x?'active':''} onClick={()=>setSize(x)} key={x}>{x}</button>)}</div></>}

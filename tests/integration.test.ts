@@ -106,6 +106,25 @@ test('Stale admin stock cannot undo a checkout reservation; price-only edits pre
   assert.equal((await db.product.findUniqueOrThrow({where:{id:activeId}})).stock,stale.stock-1);
   assert.equal((await request('/api/admin/products','PATCH',{id:activeId,stock:100},ownerCookie)).status,409);
 });
+test('Custom category translations persist independently and preserve product links and legacy API shape',async()=>{
+  const c=await db.category.findUniqueOrThrow({where:{slug:'v7-test-dresses'}});
+  assert.equal((await request('/api/admin/categories','PATCH',{id:c.id,translations:{en:'Studio dresses',ru:'Платья студии'}},operatorCookie)).status,403);
+  assert.equal((await request('/api/admin/categories','PATCH',{id:c.id,translations:{en:'Studio dresses',ru:'Платья студии'}},ownerCookie)).status,200);
+  const legacy=await (await request('/api/admin/categories','GET',undefined,ownerCookie)).json();assert.ok(Array.isArray(legacy));
+  const caps=await (await request('/api/admin/categories?translations=1','GET',undefined,ownerCookie)).json();assert.equal(caps.translationsReady,true);
+  assert.deepEqual(caps.categories.find((row:{id:number})=>row.id===c.id).translations,{en:'Studio dresses',ru:'Платья студии'});
+  const catalog=await (await request('/api/catalog')).json();assert.equal(catalog.categories.find((row:{slug:string})=>row.slug===c.slug).translations.en,'Studio dresses');
+  assert.equal(catalog.products[0].category,c.slug);
+  assert.equal((await request('/api/admin/categories','PATCH',{id:c.id,active:false},ownerCookie)).status,200);
+  assert.equal((await request('/api/admin/categories','PATCH',{id:c.id,active:true,translations:{en:''}},ownerCookie)).status,200);
+  const rows=await db.categoryTranslation.findMany({where:{categoryId:c.id}});assert.equal(rows.length,1);assert.equal(rows[0].locale,'ru');assert.equal(rows[0].name,'Платья студии');
+  const original=await db.category.findUniqueOrThrow({where:{id:c.id}});assert.equal(original.name,c.name);assert.equal(original.slug,c.slug);assert.equal(original.sortOrder,c.sortOrder);
+  assert.equal((await request('/api/admin/categories','PATCH',{id:c.id,name:'Must not save',translations:{en:123}},ownerCookie)).status,400);
+  assert.equal((await db.category.findUniqueOrThrow({where:{id:c.id}})).name,c.name);
+  const created=await request('/api/admin/categories','POST',{name:'Archive 01',slug:'v7-test-archive',translations:{ka:'არქივი 01',en:'Archive 01'}},ownerCookie);
+  assert.equal(created.status,201);const added=await created.json();assert.equal(await db.categoryTranslation.count({where:{categoryId:added.id}}),2);
+  assert.equal((await request('/api/admin/categories?id='+added.id,'DELETE',undefined,ownerCookie)).status,200);assert.equal(await db.categoryTranslation.count({where:{categoryId:added.id}}),0);
+});
 test('Operator creation and profile editing preserve existing password hashes unless explicitly changed',async()=>{
   const created=await request('/api/admin/users','POST',{name:'New test operator',email:'new@v7.test',password:'temporary-validation-password'},ownerCookie);
   assert.equal(created.status,201);const user=await created.json();assert.equal(user.role,'OPERATOR');assert.equal('passwordHash' in user,false);
@@ -158,4 +177,17 @@ test('Legacy admin orders still work before the additive Payment table is instal
     assert.equal((await request('/api/admin/orders','PATCH',{id:order.id,customerName:'Legacy compatible edit'},ownerCookie)).status,200);
     assert.equal((await request('/api/catalog')).status,200);
   }finally{await db.$executeRawUnsafe('ALTER TABLE "Payment_disabled_validation" RENAME TO "Payment"')}
+});
+test('An unmigrated category store keeps working and rejects translation writes without changing records',async()=>{
+  const c=await db.category.findUniqueOrThrow({where:{slug:'v7-test-dresses'}});
+  await db.$executeRawUnsafe('ALTER TABLE "CategoryTranslation" RENAME TO "CategoryTranslation_disabled_validation"');
+  try{
+    const caps=await (await request('/api/admin/categories?translations=1','GET',undefined,ownerCookie)).json();assert.equal(caps.translationsReady,false);
+    assert.equal((await request('/api/catalog')).status,200);
+    assert.equal((await request('/api/admin/categories','PATCH',{id:c.id,translations:{en:'Unavailable'},name:'Must not save'},ownerCookie)).status,409);
+    assert.equal((await db.category.findUniqueOrThrow({where:{id:c.id}})).name,c.name);
+    assert.equal((await request('/api/admin/categories','PATCH',{id:c.id,description:'Legacy category edits still work'},ownerCookie)).status,200);
+    const added=await request('/api/admin/categories','POST',{name:'Legacy-only',slug:'v7-test-legacy-category'},ownerCookie);assert.equal(added.status,201);
+    assert.equal((await request('/api/admin/categories?id='+(await added.json()).id,'DELETE',undefined,ownerCookie)).status,200);
+  }finally{await db.$executeRawUnsafe('ALTER TABLE "CategoryTranslation_disabled_validation" RENAME TO "CategoryTranslation"')}
 });

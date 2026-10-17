@@ -20,7 +20,9 @@
     "test:integration": "tsx --test tests/integration.test.ts",
     "test:bog": "tsx --test tests/bog.test.ts tests/checkout-config.test.ts",
     "test:checkout": "tsx --test tests/checkout.test.ts",
-    "db:payments": "prisma db execute --file prisma/payments.sql --schema prisma/schema.prisma"
+    "db:payments": "prisma db execute --file prisma/payments.sql --schema prisma/schema.prisma",
+    "db:categories": "prisma db execute --file prisma/categories.sql --schema prisma/schema.prisma",
+    "test:categories": "tsx --test tests/category-labels.test.ts"
   },
   "dependencies": {
     "next": "^16.3.8",

@@ -33,6 +33,17 @@ model Category {
   active Boolean @default(true)
   sortOrder Int @default(0)
   createdAt DateTime @default(now())
+  translations CategoryTranslation[]
+}
+
+model CategoryTranslation {
+  id         Int      @id @default(autoincrement())
+  categoryId Int
+  locale     String
+  name       String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, locale])
 }
 
 model Product {
