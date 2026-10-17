@@ -5,6 +5,7 @@ import {useSearchParams} from 'next/navigation';
 import {Plus,Search,LayoutGrid,List,X,ImagePlus,Pencil,Package,Trash2} from 'lucide-react';
 import {adminRequest,adminJson,toSlug} from '../../../lib/admin-client';
 import {money} from '../../../lib/format';
+import {prepareProductImage} from '../../../lib/product-image';
 type Product={id:number;name:string;slug:string;sku:string;category:string;description:string;imageUrl:string;sizes:string;colors:string;price:number;salePrice:number|null;cost?:number;stock:number;status:string};
 type Category={id:number;name:string;slug:string;active:boolean};
 const empty={name:'',slug:'',sku:'',category:'',description:'',imageUrl:'',sizes:'',colors:'',price:'',salePrice:'',cost:'',stock:'0',status:'ACTIVE'};
@@ -30,14 +31,15 @@ export default function ProductsClient({canDelete,canViewCost,canManageCategorie
  function close(){if(saving||uploading)return;dialog.current?.close();setOpen(false)}
  async function upload(file:File){
   if(file.size>10000000||!['image/jpeg','image/png','image/webp','image/avif'].includes(file.type)){setEditorError('აირჩიეთ JPG, PNG, WEBP ან AVIF ფოტო, მაქსიმუმ 10MB.');return}
-  setUploading(true);setEditorError('');setUploadStatus('ფოტო იტვირთება...');
+  setUploading(true);setEditorError('');setUploadStatus('ფოტო მცირდება...');
   try{
+   const prepared=await prepareProductImage(file);setUploadStatus('ფოტო იტვირთება...');
    const timestamp=Math.floor(Date.now()/1000),folder='topuria-premium/products';
    const signed=await adminRequest<{signature:string}>('/api/admin/cloudinary-sign',adminJson('POST',{paramsToSign:{timestamp,folder}}));
-   const data=new FormData();data.set('file',file);data.set('api_key',process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!);data.set('timestamp',String(timestamp));data.set('folder',folder);data.set('signature',signed.signature);
+   const data=new FormData();data.set('file',prepared.file);data.set('api_key',process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!);data.set('timestamp',String(timestamp));data.set('folder',folder);data.set('signature',signed.signature);
    const r=await fetch('https://api.cloudinary.com/v1_1/'+encodeURIComponent(process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!)+'/image/upload',{method:'POST',body:data});
    const result=await r.json();if(!r.ok||typeof result.secure_url!=='string'||!result.secure_url.startsWith('https://'))throw new Error('ფოტოს ატვირთვა ვერ შესრულდა. შეამოწმეთ Cloudinary-ის გასაღებების შესაბამისობა.');
-   setForm(old=>({...old,imageUrl:result.secure_url}));setUploadStatus('ფოტო აიტვირთა. ცვლილების შესანახად დააჭირეთ „პროდუქტის შენახვას“.');
+   setForm(old=>({...old,imageUrl:result.secure_url}));setUploadStatus('ფოტო აიტვირთა ('+Math.round(prepared.file.size/1024)+' KB). ბოლოს დააჭირეთ „პროდუქტის შენახვას“.');
   }catch(e){setEditorError((e as Error).message);setUploadStatus('')}finally{setUploading(false);if(fileInput.current)fileInput.current.value=''}
  }
  async function save(e:React.FormEvent){
