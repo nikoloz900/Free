@@ -47,3 +47,251 @@ body{font-family:var(--font-poppins);background:var(--ivory)}button,a,input,sele
 .directCatalog .shopLayout{max-width:1320px;margin-left:auto;margin-right:auto}.directCatalog .productGrid.three{grid-template-columns:repeat(4,minmax(0,1fr));gap:30px 18px}.directCatalog .productPage{max-width:1150px;margin-left:auto;margin-right:auto;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:50px}.directCatalog .gallery .fashion{height:auto;aspect-ratio:4/5;max-height:560px}.directCatalog .gallery .fashion img{object-fit:contain}.directCatalog .details{padding-top:15px}.directCatalog .details h1{font-size:25px}.adminProductGrid{grid-template-columns:repeat(5,minmax(0,1fr))}.productPhotoEditor>img,.photoEmpty{height:250px}
 @media(max-width:1100px){.directCatalog .productGrid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.adminProductGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:680px){.directCatalog .productGrid.three{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 12px}.directCatalog .productImg .fashion{aspect-ratio:4/5}.directCatalog .productPage{display:block;max-width:480px}.directCatalog .gallery .fashion{aspect-ratio:4/5;max-height:430px}.adminProductGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.productPhotoEditor>img,.photoEmpty{height:210px}}
+
+/* Category translations retain the admin palette and form controls. */
+.dash .categoryTranslations {
+  min-width: 0;
+  margin: 24px 0 0;
+  padding: 16px 18px 18px;
+  border: 1px solid var(--admin-line);
+  border-radius: 5px;
+  background: var(--panel-alt);
+}
+
+.dash .categoryTranslations legend {
+  padding: 0 7px;
+  color: var(--admin-text);
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.dash .categoryTranslations .v5Fields {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 0;
+}
+
+.dash .categoryTranslations:disabled input {
+  color: var(--admin-muted);
+  cursor: not-allowed;
+}
+
+.dash .categoryTranslationHint {
+  max-width: 85ch;
+  margin: 12px 0 24px;
+  color: var(--admin-muted);
+  font-size: 11px;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 680px) {
+  .dash .categoryTranslations {
+    padding: 12px 14px 16px;
+  }
+
+  .dash .categoryTranslations .v5Fields {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
+
+/* Quiet burgundy details keep the collection and its photography in focus. */
+.v7Store,
+.v7Store.directCatalog {
+  --wine: #702638;
+  --store-accent-soft: #f8f0f2;
+  --store-accent-line: #e7cdd4;
+  --store-button: #702638;
+  --store-button-hover: #581b2a;
+  --store-on-button: #fff;
+  --store-surface: #f8f7f5;
+}
+
+:root[data-theme=dark] .v7Store,
+:root[data-theme=dark] .v7Store.directCatalog {
+  --wine: #e1a4b3;
+  --store-accent-soft: #33242a;
+  --store-accent-line: #62414b;
+  --store-button: #a34760;
+  --store-button-hover: #b4506b;
+  --store-surface: #222020;
+}
+
+.directCatalog .header {
+  box-shadow: inset 0 2px 0 var(--wine);
+}
+
+.directCatalog .brand small,
+.directCatalog .footerBrand span,
+:root[data-theme=dark] .directCatalog .brand small,
+:root[data-theme=dark] .directCatalog .footerBrand span {
+  color: var(--wine);
+}
+
+.directCatalog .header nav a[aria-current=page] {
+  color: var(--wine);
+}
+
+.directCatalog .header nav a[aria-current=page]::after {
+  right: 0;
+}
+
+.directCatalog .drawer a[aria-current=page] {
+  color: var(--wine);
+  border-bottom-color: var(--store-accent-line);
+}
+
+.directCatalog .header .actions > a:hover,
+.directCatalog .productBreadcrumb > a:hover,
+.directCatalog .v7Footer a:hover {
+  color: var(--wine);
+}
+
+.directCatalog .iconCount em {
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  border-radius: 10px;
+  background: var(--store-button);
+  color: var(--store-on-button);
+  font-size: 8px;
+  line-height: 15px;
+  top: -8px;
+}
+
+.directCatalog .iconCount em:empty {
+  display: none;
+}
+
+.directCatalog .catalogBar button {
+  border-bottom: 1px solid var(--store-accent-line);
+  color: var(--wine);
+}
+
+.directCatalog .catalogBar button:hover,
+.directCatalog .catalogBar button[aria-expanded=true] {
+  border-bottom-color: var(--wine);
+}
+
+.directCatalog .catalogBar select:focus-visible {
+  border-bottom-color: var(--wine);
+}
+
+.directCatalog .productMeta > b,
+.directCatalog .details h2,
+.directCatalog .details .eyebrow,
+.directCatalog .resetFilters:hover,
+.directCatalog .checkoutTotal dd {
+  color: var(--wine);
+}
+
+.directCatalog .productMeta del,
+.directCatalog .details h2 del {
+  color: var(--muted);
+}
+
+.directCatalog .wish:hover,
+.directCatalog .wish.liked,
+.directCatalog .heart:hover,
+.directCatalog .heart.liked {
+  color: var(--wine);
+  background: var(--store-accent-soft);
+}
+
+.directCatalog .heart:hover,
+.directCatalog .heart.liked {
+  border-color: var(--store-accent-line);
+}
+
+.directCatalog .productBadge {
+  color: var(--wine);
+  background: var(--store-accent-soft);
+}
+
+.directCatalog .quick {
+  color: var(--wine);
+  background: var(--ivory);
+  border-bottom: 1px solid var(--store-accent-line);
+}
+
+.directCatalog .shopLayout aside label,
+.directCatalog .sizes button,
+.directCatalog .qty button,
+.directCatalog .cartQty button,
+.directCatalog .heart,
+.directCatalog .drawer > button,
+.directCatalog .header .mobile {
+  color: inherit;
+}
+
+.directCatalog .sizes button:hover,
+.directCatalog .sizes button.active,
+.directCatalog .add,
+.directCatalog .filterApply,
+.directCatalog .checkoutPrimary {
+  background: var(--store-button);
+  color: var(--store-on-button);
+  border-color: var(--store-button);
+}
+
+.directCatalog .add:not(:disabled):hover,
+.directCatalog .filterApply:hover,
+.directCatalog .checkoutPrimary:not(:disabled):hover {
+  background: var(--store-button-hover);
+  color: var(--store-on-button);
+  border-color: var(--store-button-hover);
+}
+
+.directCatalog .checkoutPrimary:disabled {
+  background: var(--line);
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+.directCatalog .summary,
+.directCatalog .searchBox,
+.directCatalog .cartQty button,
+.directCatalog .empty {
+  background: var(--store-surface);
+}
+
+.directCatalog .searchBox input,
+.directCatalog .priceInput {
+  color: var(--ink);
+}
+
+.directCatalog .searchBox:focus-within {
+  border-color: var(--wine);
+}
+
+.directCatalog .v7Footer {
+  border-top-color: var(--store-accent-line);
+}
+
+.v7Store.directCatalog :is(button, a, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--wine);
+  outline-offset: 4px;
+}
+
+.v7Store.directCatalog.checkoutPage {
+  --checkout-wine: var(--wine);
+}
+
+:root[data-theme=dark] .v7Store.directCatalog.checkoutPage {
+  --checkout-wine: var(--wine);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v7Store *,
+  .v7Store *::before,
+  .v7Store *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .v7Store .productCard:hover .fashion > img {
+    transform: none;
+  }
+}

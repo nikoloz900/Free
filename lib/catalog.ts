@@ -1,15 +1,17 @@
 import {db} from './db';
 import {cache} from 'react';
+import {getCategoryTranslations} from './category-translations-db';
 import type {Catalog} from '../app/data';
 export const getPublicCatalog=cache(async (): Promise<Catalog> => {
   const [rows,categories]=await Promise.all([
     db.product.findMany({where:{status:'ACTIVE'},orderBy:{createdAt:'desc'},select:{
       slug:true,name:true,category:true,description:true,imageUrl:true,sizes:true,colors:true,price:true,salePrice:true,stock:true,
     }}),
-    db.category.findMany({orderBy:[{sortOrder:'asc'},{name:'asc'}],select:{slug:true,name:true,description:true,active:true}}),
+    db.category.findMany({orderBy:[{sortOrder:'asc'},{name:'asc'}],select:{id:true,slug:true,name:true,description:true,active:true}}),
   ]);
   const hidden=new Set(categories.filter(c=>!c.active).map(c=>c.slug));
-  const visible=categories.filter(c=>c.active).map(({slug,name,description})=>({slug,name,description}));
+  const {byId}=await getCategoryTranslations(categories.filter(c=>c.active).map(c=>c.id));
+  const visible:Catalog['categories']=categories.filter(c=>c.active).map(({id,slug,name,description})=>({slug,name,description,...(byId.has(id)?{translations:byId.get(id)}:{})}));
   const names=new Map(visible.map(c=>[c.slug,c.name]));
   // Preserve legacy categories without rewriting existing database records.
   for(const p of rows)if(!hidden.has(p.category)&&!names.has(p.category)){
