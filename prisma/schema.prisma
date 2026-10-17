@@ -69,6 +69,35 @@ model Order {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   items        OrderItem[]
+  payment      Payment?
+}
+
+// Additive checkout table. Legacy order/product columns and their GEL units stay intact.
+model Payment {
+  id              String   @id @default(cuid())
+  orderId         Int      @unique
+  idempotencyKey  String   @unique
+  payloadHash     String
+  clientHash      String
+  createAttempts  Int      @default(0)
+  environment     String
+  method          String
+  status          String   @default("CREATING")
+  amountMinor     Int
+  currency        String   @default("GEL")
+  providerOrderId String?  @unique
+  redirectUrl     String?
+  rawStatus       String?
+  stockReleased   Boolean  @default(false)
+  expiresAt       DateTime
+  paidAt          DateTime?
+  lastCheckedAt   DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@index([status, lastCheckedAt])
+  @@index([clientHash, createdAt])
 }
 
 model OrderItem {

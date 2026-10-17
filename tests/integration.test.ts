@@ -51,11 +51,13 @@ test('Admin-created product appears in every public catalog field without cost',
 });
 test('Product edits are immediately visible; draft and hidden products stay private',async()=>{
   const form={id:activeId,name:'V7 validation dress',slug:'v7-test-dress',sku:'V7-TEST-001',category:'v7-test-dresses',price:260,salePrice:200,stock:2,cost:80,sizes:'S,M',imageUrl:'/brand/logo-burgundy.png',status:'ACTIVE'};
-  assert.equal((await request('/api/admin/products','PATCH',form,ownerCookie)).status,200);
+  const before=await db.product.findUniqueOrThrow({where:{id:activeId}});
+  assert.equal((await request('/api/admin/products','PATCH',{...form,expectedUpdatedAt:before.updatedAt.toISOString(),expectedStock:before.stock},ownerCookie)).status,200);
   const p=await (await request('/api/catalog')).json();assert.equal(p.products[0].price,200);assert.equal(p.products[0].stock,2);
   assert.equal((await request('/api/admin/products','POST',{...form,id:undefined,slug:'v7-test-draft',sku:'V7-DRAFT',status:'DRAFT'},ownerCookie)).status,201);
   await db.product.create({data:{name:'Hidden fixture',slug:'v7-test-hidden',sku:'V7-HIDDEN',category:'v7-test-hidden',price:10,status:'ACTIVE'}});
-  assert.equal((await request('/api/admin/products','PATCH',{id:activeId,stock:6},ownerCookie)).status,200);
+  const current=await db.product.findUniqueOrThrow({where:{id:activeId}});
+  assert.equal((await request('/api/admin/products','PATCH',{id:activeId,stock:6,expectedUpdatedAt:current.updatedAt.toISOString(),expectedStock:current.stock},ownerCookie)).status,200);
   assert.equal((await db.product.findUniqueOrThrow({where:{id:activeId}})).stock,6);
   const hidden=await (await request('/api/catalog')).json();assert.equal(hidden.products.length,1);assert.equal(hidden.categories.some((c:{slug:string})=>c.slug==='v7-test-hidden'),false);
   assert.equal((await request('/product/v7-test-draft')).status,404);
@@ -94,6 +96,16 @@ test('Category editing preserves product links and partial toggles preserve cate
   assert.equal((await request('/api/admin/categories','PATCH',{id:c.id,slug:'break-product-links'},ownerCookie)).status,400);
   assert.equal((await request('/api/admin/categories?id='+c.id,'DELETE',undefined,ownerCookie)).status,409);
 });
+test('Stale admin stock cannot undo a checkout reservation; price-only edits preserve fresh stock',async()=>{
+  const stale=await db.product.findUniqueOrThrow({where:{id:activeId}});
+  await db.product.update({where:{id:activeId},data:{stock:{decrement:1}}});
+  const conflicting=await request('/api/admin/products','PATCH',{id:activeId,stock:stale.stock,price:280,expectedUpdatedAt:stale.updatedAt.toISOString(),expectedStock:stale.stock},ownerCookie);
+  assert.equal(conflicting.status,409);
+  assert.equal((await db.product.findUniqueOrThrow({where:{id:activeId}})).stock,stale.stock-1);
+  assert.equal((await request('/api/admin/products','PATCH',{id:activeId,price:280},ownerCookie)).status,200);
+  assert.equal((await db.product.findUniqueOrThrow({where:{id:activeId}})).stock,stale.stock-1);
+  assert.equal((await request('/api/admin/products','PATCH',{id:activeId,stock:100},ownerCookie)).status,409);
+});
 test('Operator creation and profile editing preserve existing password hashes unless explicitly changed',async()=>{
   const created=await request('/api/admin/users','POST',{name:'New test operator',email:'new@v7.test',password:'temporary-validation-password'},ownerCookie);
   assert.equal(created.status,201);const user=await created.json();assert.equal(user.role,'OPERATOR');assert.equal('passwordHash' in user,false);
@@ -124,4 +136,26 @@ test('Analytics revenue excludes cancelled and unfulfilled orders, uses stored e
   assert.equal(updated.status,200);assert.equal((await updated.json()).address,'Test address');
   const stored=await db.order.findUniqueOrThrow({where:{id:order.id},include:{items:true}});assert.equal(stored.total,200);assert.equal(stored.status,'DELIVERED');assert.equal(stored.items.length,1);
 
+});
+test('Disabled checkout and forged bank callbacks never create orders or change stock',async()=>{
+  const before={orders:await db.order.count(),stock:(await db.product.findUniqueOrThrow({where:{id:activeId}})).stock};
+  const configResponse=await request('/api/checkout/config');assert.equal(configResponse.status,200);
+  assert.match(configResponse.headers.get('cache-control')||'',/no-store/);
+  const config=await configResponse.json();assert.equal(config.enabled,false);assert.ok(config.methods.every((method:{enabled:boolean})=>!method.enabled));
+  const disabled=await request('/api/checkout','POST',{idempotencyKey:crypto.randomUUID()});assert.equal(disabled.status,503);
+  assert.equal((await request('/api/checkout','POST',{},undefined,'https://other.example')).status,403);
+  assert.equal((await request('/api/payments/bog/callback','POST',{event:'order_payment',body:{order_id:'forged'}})).status,401);
+  assert.equal((await request('/api/checkout/reconcile')).status,401);
+  assert.equal((await request('/api/admin/payments/reconcile','POST',{id:'forged'})).status,403);
+  assert.equal((await request('/api/payments/bog/callback','POST',{body:'x'.repeat(256_001)})).status,413);
+  assert.equal(await db.order.count(),before.orders);assert.equal((await db.product.findUniqueOrThrow({where:{id:activeId}})).stock,before.stock);
+});
+test('Legacy admin orders still work before the additive Payment table is installed',async()=>{
+  const order=await db.order.findUniqueOrThrow({where:{orderNo:'V7-NEW'}});
+  await db.$executeRawUnsafe('ALTER TABLE "Payment" RENAME TO "Payment_disabled_validation"');
+  try{
+    assert.equal((await request('/admin/orders','GET',undefined,ownerCookie)).status,200);
+    assert.equal((await request('/api/admin/orders','PATCH',{id:order.id,customerName:'Legacy compatible edit'},ownerCookie)).status,200);
+    assert.equal((await request('/api/catalog')).status,200);
+  }finally{await db.$executeRawUnsafe('ALTER TABLE "Payment_disabled_validation" RENAME TO "Payment"')}
 });
