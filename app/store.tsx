@@ -3,7 +3,7 @@ import {createContext,useContext,useEffect,useMemo,useState} from 'react';
 import {useCatalog} from './catalog';
 import {track} from './tracking';
 export type CartItem={slug:string;size:string;qty:number};
-type Store={cart:CartItem[];wishlist:string[];add:(slug:string,size?:string,qty?:number)=>void;remove:(slug:string,size?:string)=>void;setQty:(slug:string,size:string,qty:number)=>void;toggleWish:(slug:string)=>void;cartCount:number};
+type Store={cart:CartItem[];wishlist:string[];add:(slug:string,size?:string,qty?:number)=>void;remove:(slug:string,size?:string)=>void;setQty:(slug:string,size:string,qty:number)=>void;clearPurchased:(items:CartItem[])=>void;toggleWish:(slug:string)=>void;cartCount:number;cartReady:boolean};
 const C=createContext<Store|null>(null);
 export function StoreProvider({children}:{children:React.ReactNode}){const {products}=useCatalog();const [cart,setCart]=useState<CartItem[]>([]);const [wishlist,setWishlist]=useState<string[]>([]);const [ready,setReady]=useState(false);
  useEffect(()=>{try{
@@ -26,5 +26,14 @@ export function StoreProvider({children}:{children:React.ReactNode}){const {prod
    const count=Math.max(0,Math.min(qty,p.stock-others));return c.map(x=>x.slug===slug&&x.size===size?{...x,qty:count}:x).filter(x=>x.qty>0)});
  };
  const toggleWish=(slug:string)=>setWishlist(w=>w.includes(slug)?w.filter(x=>x!==slug):[...w,slug]);
- const value=useMemo(()=>({cart,wishlist,add,remove,setQty,toggleWish,cartCount:cart.reduce((a,b)=>a+b.qty,0)}),[cart,wishlist,products]);return <C.Provider value={value}>{children}</C.Provider>}
+ const clearPurchased=(items:CartItem[])=>setCart(current=>{
+  const quantities=new Map<string,number>();
+  for(const item of items){if(!Number.isInteger(item.qty)||item.qty<=0)continue;const key=JSON.stringify([item.slug,item.size]);quantities.set(key,(quantities.get(key)||0)+item.qty)}
+  return current.flatMap(item=>{
+   const key=JSON.stringify([item.slug,item.size]);const purchased=Math.min(item.qty,quantities.get(key)||0);
+   quantities.set(key,(quantities.get(key)||0)-purchased);const qty=item.qty-purchased;
+   return qty>0?[{...item,qty}]:[];
+  });
+ });
+ const value=useMemo(()=>({cart,wishlist,add,remove,setQty,clearPurchased,toggleWish,cartCount:cart.reduce((a,b)=>a+b.qty,0),cartReady:ready}),[cart,wishlist,products,ready]);return <C.Provider value={value}>{children}</C.Provider>}
 export function useStore(){const v=useContext(C);if(!v)throw new Error('StoreProvider missing');return v}

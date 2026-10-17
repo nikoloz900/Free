@@ -6,7 +6,7 @@ import {Plus,Search,LayoutGrid,List,X,ImagePlus,Pencil,Package,Trash2} from 'luc
 import {adminRequest,adminJson,toSlug} from '../../../lib/admin-client';
 import {money} from '../../../lib/format';
 import {prepareProductImage} from '../../../lib/product-image';
-type Product={id:number;name:string;slug:string;sku:string;category:string;description:string;imageUrl:string;sizes:string;colors:string;price:number;salePrice:number|null;cost?:number;stock:number;status:string};
+type Product={id:number;name:string;slug:string;sku:string;category:string;description:string;imageUrl:string;sizes:string;colors:string;price:number;salePrice:number|null;cost?:number;stock:number;status:string;updatedAt:string};
 type Category={id:number;name:string;slug:string;active:boolean};
 const empty={name:'',slug:'',sku:'',category:'',description:'',imageUrl:'',sizes:'',colors:'',price:'',salePrice:'',cost:'',stock:'0',status:'ACTIVE'};
 
@@ -14,6 +14,8 @@ const statusLabels:Record<string,string>={ACTIVE:'აქტიური',DRAFT:'
 export default function ProductsClient({canDelete,canViewCost,canManageCategories}:{canDelete:boolean;canViewCost:boolean;canManageCategories:boolean}){
  const [items,setItems]=useState<Product[]>([]),[categories,setCategories]=useState<Category[]>([]),[form,setForm]=useState(empty);
  const [editing,setEditing]=useState<number|null>(null),[open,setOpen]=useState(false),[saving,setSaving]=useState(false),[loading,setLoading]=useState(true);
+ const [editingVersion,setEditingVersion]=useState<string|null>(null);
+ const [editingStock,setEditingStock]=useState<number|null>(null);
  const [error,setError]=useState(''),[editorError,setEditorError]=useState(''),[success,setSuccess]=useState(''),[query,setQuery]=useState(''),[filter,setFilter]=useState('ALL'),[view,setView]=useState<'list'|'grid'>('list'),[uploading,setUploading]=useState(false),[uploadStatus,setUploadStatus]=useState('');
  const dialog=useRef<HTMLDialogElement>(null);const fileInput=useRef<HTMLInputElement>(null);const params=useSearchParams();
  const cloudinaryReady=Boolean(process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME&&process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY);
@@ -27,7 +29,7 @@ export default function ProductsClient({canDelete,canViewCost,canManageCategorie
  useEffect(()=>{void load()},[]);
  useEffect(()=>{if(!open)return;dialog.current?.showModal();const before=document.body.style.overflow;document.body.style.overflow='hidden';
   return()=>{document.body.style.overflow=before}},[open]);
- function start(p?:Product){setEditorError('');setUploadStatus('');setEditing(p?.id??null);setForm(p?{name:p.name,slug:p.slug,sku:p.sku,category:p.category,description:p.description,imageUrl:p.imageUrl,sizes:p.sizes,colors:p.colors,price:String(p.price),salePrice:p.salePrice===null?'':String(p.salePrice),cost:String(p.cost||0),stock:String(p.stock),status:p.status}:{...empty,category:categories.find(c=>c.active)?.slug||''});setOpen(true)}
+ function start(p?:Product){setEditorError('');setUploadStatus('');setEditing(p?.id??null);setEditingVersion(p?.updatedAt??null);setEditingStock(p?.stock??null);setForm(p?{name:p.name,slug:p.slug,sku:p.sku,category:p.category,description:p.description,imageUrl:p.imageUrl,sizes:p.sizes,colors:p.colors,price:String(p.price),salePrice:p.salePrice===null?'':String(p.salePrice),cost:String(p.cost||0),stock:String(p.stock),status:p.status}:{...empty,category:categories.find(c=>c.active)?.slug||''});setOpen(true)}
  function close(){if(saving||uploading)return;dialog.current?.close();setOpen(false)}
  async function upload(file:File){
   if(file.size>10000000||!['image/jpeg','image/png','image/webp','image/avif'].includes(file.type)){setEditorError('აირჩიეთ JPG, PNG, WEBP ან AVIF ფოტო, მაქსიმუმ 10MB.');return}
@@ -44,10 +46,20 @@ export default function ProductsClient({canDelete,canViewCost,canManageCategorie
  }
  async function save(e:React.FormEvent){
   e.preventDefault();setSaving(true);setEditorError('');
-  try{const data={...form,id:editing,slug:form.slug||toSlug(form.name)+'-'+crypto.randomUUID().slice(0,8),sku:form.sku||'TP-'+crypto.randomUUID().slice(0,8).toUpperCase()};
+  try{const data={...form,id:editing,...(editing?{expectedUpdatedAt:editingVersion,expectedStock:editingStock}:{}),slug:form.slug||toSlug(form.name)+'-'+crypto.randomUUID().slice(0,8),sku:form.sku||'TP-'+crypto.randomUUID().slice(0,8).toUpperCase()};
    const product=await adminRequest<Product>('/api/admin/products',adminJson(editing?'PATCH':'POST',data));
    setItems(list=>editing?list.map(p=>p.id===product.id?product:p):[product,...list]);
    setSuccess(editing?'პროდუქტი განახლდა.':'პროდუქტი დაემატა.');setError('');dialog.current?.close();setOpen(false);
+  }catch(e){setEditorError((e as Error).message)}finally{setSaving(false)}
+ }
+ async function reloadEditor(){
+  if(!editing)return;
+  setSaving(true);setEditorError('');
+  try{
+   const products=await adminRequest<Product[]>('/api/admin/products');setItems(products);
+   const product=products.find(p=>p.id===editing);
+   if(!product)throw new Error('პროდუქტი ვერ მოიძებნა. დახურეთ რედაქტორი და განაახლეთ სია.');
+   start(product);
   }catch(e){setEditorError((e as Error).message)}finally{setSaving(false)}
  }
  async function remove(p:Product){
@@ -67,7 +79,7 @@ export default function ProductsClient({canDelete,canViewCost,canManageCategorie
  <div className="v5Panel adminEmpty"><Package size={35}/><h2>{items.length?'პროდუქტი ვერ მოიძებნა':'დაამატე პირველი პროდუქტი'}</h2><p>{items.length?'შეცვალე ძებნა ან ფილტრი.':'ფოტო, ფასი და მარაგი — ერთ სივრცეში.'}</p><button className="adminPrimary" onClick={()=>start()}><Plus size={16}/>პროდუქტის დამატება</button></div>}
  {open&&<dialog ref={dialog} className="productEditorDialog" onCancel={e=>{if(saving||uploading)e.preventDefault();else setOpen(false)}} onClose={()=>setOpen(false)}>
  <form onSubmit={save}><header><div><span>TOPURIA PRODUCT STUDIO</span><h2>{editing?'პროდუქტის რედაქტირება':'ახალი პროდუქტი'}</h2></div><button type="button" disabled={saving||uploading} aria-label="რედაქტორის დახურვა" onClick={close}><X size={21}/></button></header>
- <div className="productEditorBody">{editorError&&<p role="alert" className="adminNotice error">{editorError}</p>}<fieldset disabled={saving||uploading}><div className="productEditorGrid">
+ <div className="productEditorBody">{editorError&&<p role="alert" className="adminNotice error">{editorError}</p>}{editing&&editorError.startsWith('პროდუქტის მონაცემები შეიცვალა.')&&<div><p className="v5Hint">ჩატვირთვისას რედაქტორში შეტანილი შეუნახავი ცვლილებები გასუფთავდება.</p><button type="button" className="adminSecondary" disabled={saving||uploading} onClick={()=>void reloadEditor()}>უახლესი მონაცემების ჩატვირთვა</button></div>}<fieldset disabled={saving||uploading}><div className="productEditorGrid">
  <div className="productPhotoEditor">{form.imageUrl?<img src={form.imageUrl} alt="პროდუქტის ფოტო"/>:<div className="photoEmpty"><ImagePlus size={42}/><span>დაამატე პროდუქტის ფოტო</span></div>}
  <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,image/avif" aria-label="პროდუქტის ფოტოს ატვირთვა" hidden onChange={e=>{const file=e.target.files?.[0];if(file)void upload(file)}}/>
  {cloudinaryReady?<button type="button" disabled={uploading} className="adminPrimary" onClick={()=>fileInput.current?.click()}><ImagePlus size={16}/>{uploading?'ფოტო იტვირთება...':form.imageUrl?'ფოტოს შეცვლა':'ფოტოს ატვირთვა'}</button>:<p className="v5Hint">ფოტოს ატვირთვა არ არის კონფიგურირებული. შეგიძლიათ ფოტოს ბმული მიუთითოთ.</p>}

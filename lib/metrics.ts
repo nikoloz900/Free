@@ -1,5 +1,5 @@
 import {db} from './db';
-export const orderLabels:Record<string,string>={NEW:'ახალი',CONFIRMED:'დადასტურებული',PREPARING:'მზადდება',SHIPPED:'გაგზავნილი',DELIVERED:'ჩაბარებული',CANCELLED:'გაუქმებული'};
+export const orderLabels:Record<string,string>={NEW:'ახალი',AWAITING_PAYMENT:'გადახდის მოლოდინში',PAYMENT_REVIEW:'გადახდა შესამოწმებელია',PAYMENT_TEST:'სატესტო შეკვეთა',CONFIRMED:'დადასტურებული',PREPARING:'მზადდება',SHIPPED:'გაგზავნილი',DELIVERED:'ჩაბარებული',CANCELLED:'გაუქმებული'};
 export async function getMetrics(days:number){
   const today=new Date();today.setUTCHours(0,0,0,0);const since=new Date(today);since.setUTCDate(since.getUTCDate()-days+1);
   const until=new Date(today);until.setUTCDate(until.getUTCDate()+1);const previous=new Date(since);previous.setUTCDate(previous.getUTCDate()-days);
@@ -8,7 +8,7 @@ export async function getMetrics(days:number){
     db.analyticsEvent.findMany({where:{createdAt:{gte:since,lt:until}},select:{type:true,sessionId:true,source:true,device:true,productSlug:true,createdAt:true}}),
   ]);
   const current=orders.filter(o=>o.createdAt>=since),prior=orders.filter(o=>o.createdAt<since);
-  const valid=current.filter(o=>o.status!=='CANCELLED'),delivered=valid.filter(o=>o.status==='DELIVERED');
+  const valid=current.filter(o=>!['CANCELLED','AWAITING_PAYMENT','PAYMENT_REVIEW','PAYMENT_TEST'].includes(o.status)),delivered=valid.filter(o=>o.status==='DELIVERED');
   const revenue=delivered.reduce((s,o)=>s+o.total,0),previousRevenue=prior.filter(o=>o.status==='DELIVERED').reduce((s,o)=>s+o.total,0);
   const sessions=new Set(events.map(e=>e.sessionId).filter(Boolean)).size;
   const productViews=events.filter(e=>e.type==='product_view').length,cartAdds=events.filter(e=>e.type==='add_to_cart').length;
