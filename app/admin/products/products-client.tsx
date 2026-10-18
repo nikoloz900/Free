@@ -70,7 +70,7 @@ export default function ProductsClient({canDelete,canViewCost,canManageCategorie
   catch(e){setError((e as Error).message)}
  }
  const shown=items.filter(p=>(filter==='ALL'||p.status===filter)&&(p.name+' '+p.sku+' '+p.category).toLowerCase().includes(query.toLowerCase()));
- const field=(key:keyof typeof empty,label:string,type='text',required=false)=><label>{label}<input type={type} required={required} min={type==='number'?0:undefined} step={type==='number'?1:undefined} value={form[key]} onChange={e=>setForm({...form,[key]:e.target.value})}/></label>;
+ const field=(key:Exclude<keyof typeof empty,'sizeStock'>,label:string,type='text',required=false)=><label>{label}<input type={type} required={required} min={type==='number'?0:undefined} step={type==='number'?1:undefined} value={form[key]} onChange={e=>setForm({...form,[key]:e.target.value})}/></label>;
  const categoryName=(p:Product)=>categories.find(c=>c.slug===p.category)?.name||p.category;
  return <>{error&&<p role="alert" className="adminNotice error">{error}</p>}{success&&<p role="status" className="adminNotice success">{success}</p>}
  <div className="productWorkspaceToolbar"><div className="productSearch"><Search size={17}/><input aria-label="პროდუქტის ძებნა" placeholder="მოძებნე პროდუქტი..." value={query} onChange={e=>setQuery(e.target.value)}/></div><div className="productViewSwitch"><button aria-label="სიის ხედი" aria-pressed={view==='list'} onClick={()=>setView('list')}><List size={17}/></button><button aria-label="ბარათების ხედი" aria-pressed={view==='grid'} onClick={()=>setView('grid')}><LayoutGrid size={17}/></button></div><button className="adminPrimary" onClick={()=>start()}><Plus size={17}/>პროდუქტის დამატება</button></div>
