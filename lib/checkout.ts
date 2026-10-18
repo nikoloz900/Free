@@ -1,5 +1,6 @@
 import {createHash, createHmac, randomBytes, timingSafeEqual} from 'node:crypto';
 import {Prisma, PrismaClient} from '@prisma/client';
+import {parseSizeStock} from './size-stock';
 import {BogError, createBogOrder, getBogOrder, type NormalizedBogOrder} from './bog';
 import {type CheckoutConfig, type CheckoutMethod} from './checkout-config';
 
@@ -104,9 +105,20 @@ export function createCheckoutService(db: PrismaClient, config: CheckoutConfig, 
   async function release(tx: Prisma.TransactionClient, row: RecordWithOrder, status: 'FAILED' | 'EXPIRED', rawStatus: string) {
     if (row.paidAt || row.status === 'PAID' || (row.status === 'REVIEW' && row.rawStatus !== 'CREATE_UNCERTAIN')) return;
     if (!row.stockReleased) {
-      const quantities = new Map<number, number>();
-      for (const i of row.order.items) quantities.set(i.productId, (quantities.get(i.productId) || 0) + i.quantity);
-      for (const [id, quantity] of [...quantities].sort((a, b) => a[0] - b[0])) await tx.product.update({where: {id}, data: {stock: {increment: quantity}}});
+      const grouped = new Map<number, {quantity:number; sizes:Map<string,number>}>();
+      for (const i of row.order.items) {
+        const g=grouped.get(i.productId)||{quantity:0,sizes:new Map<string,number>()};
+        g.quantity+=i.quantity;
+        if(i.size)g.sizes.set(i.size,(g.sizes.get(i.size)||0)+i.quantity);
+        grouped.set(i.productId,g);
+      }
+      for (const [id, g] of [...grouped].sort((a,b)=>a[0]-b[0])) {
+        await tx.$queryRaw`SELECT "id" FROM "Product" WHERE "id"=${id} FOR UPDATE`;
+        const p=await tx.product.findUniqueOrThrow({where:{id}});
+        const sizes=parseSizeStock(p.sizeStock);
+        if (sizes && g.sizes.size) for (const [size,qty] of g.sizes) sizes[size]=(sizes[size]||0)+qty;
+        await tx.product.update({where:{id},data:{stock:{increment:g.quantity},...(sizes?{sizeStock:JSON.stringify(sizes)}:{})}});
+      }
     }
     await tx.payment.update({where: {id: row.id}, data: {status, stockReleased: true, rawStatus, lastCheckedAt: new Date()}});
     await tx.order.update({where: {id: row.orderId}, data: {status: 'CANCELLED'}});
@@ -204,6 +216,7 @@ export function createCheckoutService(db: PrismaClient, config: CheckoutConfig, 
           const categories = await tx.category.findMany({where: {slug: {in: products.map(p => p.category)}, active: false}, select: {slug: true}});
           const hidden = new Set(categories.map(c => c.slug));
           const demand = new Map<number, number>();
+          const sizeDemand = new Map<number, Map<string,number>>();
           const items = input.items.map(i => {
             const p = products.find(p => p.slug === i.slug);
             if (!p || p.status !== 'ACTIVE' || hidden.has(p.category)) throw new CheckoutError('პროდუქტი აღარ არის ხელმისაწვდომი. განაახლეთ კალათა.', 409);
@@ -212,13 +225,25 @@ export function createCheckoutService(db: PrismaClient, config: CheckoutConfig, 
             const price = p.salePrice !== null && p.salePrice >= 0 && p.salePrice < p.price ? p.salePrice : p.price;
             if (price <= 0 || !Number.isSafeInteger(price)) throw new CheckoutError('პროდუქტის ფასი ამ ეტაპზე მიუწვდომელია.', 409);
             demand.set(p.id, (demand.get(p.id) || 0) + i.qty);
+            if(sizes.length){const d=sizeDemand.get(p.id)||new Map<string,number>();d.set(i.size,(d.get(i.size)||0)+i.qty);sizeDemand.set(p.id,d)}
             return {productId: p.id, name: p.name, price, cost: p.cost, quantity: i.qty, size: i.size || null};
           });
           const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
           if (!Number.isSafeInteger(total) || total * 100 !== input.expectedTotalMinor) throw new CheckoutError('კალათის ფასი შეიცვალა. განაახლეთ გვერდი და გადაამოწმეთ თანხა.', 409);
           for (const [id, qty] of [...demand].sort((a, b) => a[0] - b[0])) {
             if (qty > 10) throw new CheckoutError('ერთ მოდელზე მაქსიმუმ 10 ერთეულის შეკვეთაა შესაძლებელი.');
-            const reserved = await tx.product.updateMany({where: {id, stock: {gte: qty}, status: 'ACTIVE'}, data: {stock: {decrement: qty}}});
+            await tx.$queryRaw`SELECT "id" FROM "Product" WHERE "id"=${id} FOR UPDATE`;
+            const product=await tx.product.findUniqueOrThrow({where:{id}});
+            const variants=parseSizeStock(product.sizeStock);
+            const required=sizeDemand.get(id);
+            if(required){
+              if(!variants)throw new CheckoutError('ზომების მარაგი ჯერ არ არის დაზუსტებული. სცადეთ მოგვიანებით.',409);
+              for(const [size,count] of required) {
+                if(!Object.hasOwn(variants,size)||variants[size]<count)throw new CheckoutError('არჩეული ზომის რაოდენობა მარაგში აღარ არის. განაახლეთ კალათა.',409);
+                variants[size]-=count;
+              }
+            }
+            const reserved = await tx.product.updateMany({where: {id, stock: {gte: qty}, status: 'ACTIVE'}, data: {stock: {decrement: qty},...(required?{sizeStock:JSON.stringify(variants)}:{})}});
             if (reserved.count !== 1) throw new CheckoutError('არჩეული რაოდენობა მარაგში აღარ არის. განაახლეთ კალათა.', 409);
           }
           return tx.payment.create({data: {
