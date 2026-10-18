@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
 /* Topuria Premium V7 — storefront and an independent admin palette. */
 @font-face{font-family:Topuria Sans;src:url('/fonts/noto-sans-georgian-georgian-wght-normal.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap;unicode-range:U+10A0-10FF,U+1C90-1CBF,U+2D00-2D2F}
@@ -302,4 +303,41 @@ body{font-family:var(--font-poppins);background:var(--ivory)}button,a,input,sele
 }
 @media (min-width: 768px) and (max-width: 1199px) {
   .v7Store.directCatalog.homeCatalog .productGrid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 14px; }
+}
+
+/* Topuria Premium storefront refinement — compact products and readable editorial type. */
+.v7Store.directCatalog {
+  --wine: #78283e;
+  --store-button: #78283e;
+  --store-button-hover: #5e1d30;
+  font-family: 'Poppins', 'Topuria Sans', Arial, sans-serif;
+}
+:root[data-theme="dark"] .v7Store.directCatalog {
+  --wine: #e6a5b7;
+  --store-button: #a94765;
+  --store-button-hover: #c05c7b;
+}
+.v7Store.directCatalog .header nav { font-size: 13px; font-weight: 500; }
+.v7Store.directCatalog .directCatalogHeading h1 { font-size: clamp(19px, 2vw, 28px); line-height: 1.35; font-weight: 500; }
+.v7Store.directCatalog .productMeta strong { font-size: 13px; line-height: 1.55; }
+.v7Store.directCatalog .directCatalogHeading > div:first-child > span { font-size: 11px; }
+@media (min-width: 1200px) {
+  .v7Store.directCatalog.homeCatalog .catalog .productGrid.three {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 22px 14px;
+  }
+  .v7Store.directCatalog.homeCatalog .shopLayout { max-width: 1480px; }
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .v7Store.directCatalog.homeCatalog .catalog .productGrid.three {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 20px 14px;
+  }
+}
+@media (max-width: 767px) {
+  .v7Store.directCatalog.homeCatalog .catalog .productGrid.three {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .v7Store.directCatalog .header nav { font-size: 12px; }
+  .v7Store.directCatalog .directCatalogHeading h1 { font-size: 19px; }
 }
