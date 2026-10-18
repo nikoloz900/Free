@@ -341,3 +341,36 @@ body{font-family:var(--font-poppins);background:var(--ivory)}button,a,input,sele
   .v7Store.directCatalog .header nav { font-size: 12px; }
   .v7Store.directCatalog .directCatalogHeading h1 { font-size: 19px; }
 }
+
+/* Launch readiness dashboard: compact, actionable catalog checks. */
+.dash .launchPanel{margin-bottom:22px;padding:24px}
+.dash .launchStats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.dash .launchStats>div{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0;padding:18px 16px;border:1px solid var(--admin-line);border-radius:8px;background:var(--panel-alt)}
+.dash .launchStats svg{color:#b66b82}
+.dash .launchStats strong{font-size:26px;line-height:1.2;color:var(--admin-text);font-weight:600}
+.dash .launchStats span{font-size:11px;color:var(--admin-muted)}
+.dash .launchStats .launchWarning svg,.dash .launchStats .launchWarning strong{color:#d38a64}
+.dash .launchHint{margin:17px 0 0;color:var(--admin-muted);font-size:11px;line-height:1.8}
+@media(max-width:900px){.dash .launchStats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:580px){.dash .launchStats{grid-template-columns:repeat(2,minmax(0,1fr))}.dash .launchPanel{padding:16px}}
+
+/* Premium commerce dashboard, reference-inspired, scoped to admin only. */
+.dash{--admin-accent:#923b58}
+.dash[data-admin-theme="light"]{--admin-accent:#8b304b}
+.dash .adminSidebar{border-right:1px solid var(--admin-line)}
+.dash .dashTop h1{font-size:clamp(25px,2.5vw,34px);font-weight:600;letter-spacing:-.04em}
+.dash .adminSubtitle{font-size:12px}
+.dash .kpis article,.dash .adminPanel,.dash .welcomeCard{border-radius:14px}
+.dash .kpis article{padding:22px 24px;min-height:140px;transition:transform .2s ease,border-color .2s ease}
+.dash .kpis article:hover{transform:translateY(-2px);border-color:#a56a81}
+.dash .kpis b{font-size:clamp(26px,2.6vw,36px);font-weight:600;letter-spacing:-.04em}
+.dash .kpis span,.dash .kpis small{font-size:11px}
+.dash .adminPanel{padding:24px}
+.dash .panelHeading h2{font-size:15px;font-weight:600}
+.dash .panelHeading small{font-size:11px}
+.dash .welcomeCard{background:linear-gradient(135deg,#853e58 0%,#52263e 60%,#302239 100%);border-color:#9b637b}
+.dash .welcomeCard h2{font-size:clamp(25px,2.4vw,34px);line-height:1.4;font-weight:500}
+.dash .welcomeCard p{font-size:12px}
+.dash .dateTabs{border-radius:10px}
+.dash .overviewTable th{font-size:11px}
+@media(max-width:680px){.dash .kpis article{min-height:120px;padding:16px}.dash .adminPanel{padding:17px}}

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import {redirect} from 'next/navigation';
-import {ShoppingBag,ShoppingCart,Wallet,Users,ArrowUpRight,Plus,Package,Activity} from 'lucide-react';
+import {ShoppingBag,ShoppingCart,Wallet,Users,ArrowUpRight,Plus,Package,Activity,AlertTriangle,CheckCircle2,ImageOff,Layers} from 'lucide-react';
 import {getAdmin} from '../../../lib/auth';
 import {db} from '../../../lib/db';
 import {getMetrics,orderLabels} from '../../../lib/metrics';
@@ -9,11 +9,14 @@ import AdminNav from '../_nav';
 import RevenueChart from '../revenue-chart';
 export default async function Dashboard({searchParams}:{searchParams:Promise<{days?:string}>}){
   const admin=await getAdmin();if(!admin)redirect('/admin/login');const sp=await searchParams;const days=sp.days==='7'?7:sp.days==='90'?90:30;
-  const [productCount,activeCount,lowProducts,orders,metrics]=await Promise.all([
+  const [productCount,activeCount,lowProducts,orders,metrics,unpublishedCount,missingPhotosCount,outOfStockCount]=await Promise.all([
     db.product.count(),db.product.count({where:{status:'ACTIVE'}}),
     db.product.findMany({where:{status:'ACTIVE',stock:{lte:5}},select:{id:true,name:true,stock:true,imageUrl:true},orderBy:{stock:'asc'},take:6}),
     admin.manageOrders?db.order.findMany({orderBy:{createdAt:'desc'},take:6,include:{items:{select:{name:true,quantity:true}}}}):Promise.resolve([]),
     admin.viewStatistics?getMetrics(days):Promise.resolve(null),
+    db.product.count({where:{status:{not:'ACTIVE'}}}),
+    db.product.count({where:{imageUrl:''}}),
+    db.product.count({where:{status:'ACTIVE',stock:{lte:0}}}),
   ]);
   const change=metrics&&metrics.previousRevenue>0?(metrics.revenue-metrics.previousRevenue)/metrics.previousRevenue*100:null;
   const kpis=metrics?[{label:'ჩაბარებული გაყიდვები',value:money(metrics.revenue),note:change!==null?(change>=0?'+':'')+change.toFixed(1)+'% წინა პერიოდთან':'წინა პერიოდში შედარება არ არის',icon:Wallet},
@@ -23,6 +26,7 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
     [{label:'პროდუქტები',value:productCount,note:'მთლიანი კატალოგი',icon:ShoppingBag},{label:'აქტიური პროდუქტები',value:activeCount,note:'საჯარო კოლექცია',icon:Package}];
   return <main className="dash"><AdminNav active="dashboard" admin={admin}/><section><div className="dashTop"><div><p>სამუშაო სივრცე / მთავარი</p><h1>მთავარი პანელი</h1><span className="adminSubtitle">ყველაფერი შენი მაღაზიის შესახებ.</span></div><Link className="adminPrimary" href="/admin/products"><Plus size={16}/>პროდუქტის დამატება</Link></div>
     <div className="kpis">{kpis.map((k,i)=><article key={k.label}><div className="kpiHead"><span>{k.label}</span><span className={'kpiIcon tone'+i}><k.icon size={20}/></span></div><b>{k.value}</b><small>{k.note}</small></article>)}</div>
+    <article className="adminPanel launchPanel"><div className="panelHeading"><div><h2><CheckCircle2 size={18}/>კატალოგის მზადყოფნა</h2><small>მონაცემები პირდაპირ პროდუქტის ბაზიდან · გამოქვეყნებამდე გადაამოწმე</small></div><Link href="/admin/products">პროდუქტების მართვა <ArrowUpRight size={15}/></Link></div><div className="launchStats"><div><Package size={19}/><strong>{productCount}</strong><span>სულ მოდელი</span></div><div><CheckCircle2 size={19}/><strong>{activeCount}</strong><span>აქტიური</span></div><div><Layers size={19}/><strong>{unpublishedCount}</strong><span>არააქტიური</span></div><div className={missingPhotosCount?'launchWarning':''}><ImageOff size={19}/><strong>{missingPhotosCount}</strong><span>ფოტოს გარეშე</span></div><div className={outOfStockCount?'launchWarning':''}><AlertTriangle size={19}/><strong>{outOfStockCount}</strong><span>ამოწურული აქტიური</span></div></div><p className="launchHint">50 მოდელის დამატებისას თითოეულს გადაამოწმე: დასახელება, SKU, ფასი, ფოტო, ზომები, მარაგი და გამოქვეყნების სტატუსი. ზომების მიხედვით დამოუკიდებელი მარაგი ჯერ არ აღირიცხება.</p></article>
     <div className="overviewGrid"><div className="welcomeCard"><span className="eyebrow">TOPURIA STUDIO</span><h2>გამარჯობა,<br/>{admin.name.split(' ')[0]}.</h2><p>ახალი კოლექცია იწყება აქ.</p><div className="welcomeMonogram" aria-hidden="true">T</div><Link href="/admin/products">კატალოგის მართვა <ArrowUpRight size={16}/></Link></div>
       {metrics&&<article className="adminPanel revenuePanel"><div className="panelHeading"><div><h2>გაყიდვების მიმოხილვა</h2><small>შეკვეთის შექმნის თარიღით · UTC</small></div><nav className="dateTabs" aria-label="გრაფიკის პერიოდი">{[7,30,90].map(d=><Link key={d} className={days===d?'active':''} href={'/admin/dashboard?days='+d}>{d} დღე</Link>)}</nav></div><RevenueChart daily={metrics.daily}/></article>}
     </div>
