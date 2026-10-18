@@ -395,3 +395,33 @@ body{font-family:var(--font-poppins);background:var(--ivory)}button,a,input,sele
 .dash .commerceChart .chartControls .segmented button.active,.dash .dateTabs .active{color:var(--admin-accent)}
 @media(max-width:1050px){.dash .commerceMainGrid{grid-template-columns:1fr}.dash .commerceInsights{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){.dash .commerceInsights{grid-template-columns:1fr}.dash .commerceChart{padding:16px}.dash .commerceMainGrid .funnelSteps{grid-template-columns:1fr}}
+
+/* Topuria Studio — brighter premium admin palette, with genuine dark mode. */
+.dash[data-admin-theme="light"]{
+ --admin-bg:#f9f5f6;--panel:#ffffff;--panel-alt:#fff9fb;
+ --admin-text:#32242e;--admin-muted:#867680;--admin-line:#eadfe4;
+ --admin-accent:#8d3655;--admin-input:#fcf6f8;
+ background:var(--admin-bg)!important;color:var(--admin-text);
+}
+.dash[data-admin-theme="dark"]{
+ --admin-bg:#16161d;--panel:#22212b;--panel-alt:#292631;
+ --admin-text:#f9eef3;--admin-muted:#b5a5b1;--admin-line:#413440;
+ --admin-accent:#e1a1b8;--admin-input:#2e2934;
+ background:var(--admin-bg)!important;color:var(--admin-text);
+}
+.dash[data-admin-theme="light"] .adminSidebar{background:#fff!important}
+.dash[data-admin-theme="light"] .adminToolbar{background:#fff!important}
+.dash[data-admin-theme="light"] .kpis article,.dash[data-admin-theme="light"] .adminPanel{box-shadow:0 5px 24px rgba(105,38,64,.055)}
+.dash[data-admin-theme="light"] .kpis article:nth-child(1){background:linear-gradient(145deg,#fff,#fff0f5)}
+.dash[data-admin-theme="light"] .kpis article:nth-child(2){background:linear-gradient(145deg,#fff,#f1f0ff)}
+.dash[data-admin-theme="light"] .kpis article:nth-child(3){background:linear-gradient(145deg,#fff,#edf9f6)}
+.dash[data-admin-theme="light"] .kpis article:nth-child(4){background:linear-gradient(145deg,#fff,#fff5e9)}
+.dash[data-admin-theme="light"] .commerceMetric:nth-child(1){background:#fff0f5}
+.dash[data-admin-theme="light"] .commerceMetric:nth-child(2){background:#f3f1ff}
+.dash[data-admin-theme="light"] .commerceMetric:nth-child(3){background:#eff9f5}
+.dash[data-admin-theme="light"] .launchStats>div{background:#fff9fb}
+.dash[data-admin-theme="light"] .adminSidebar nav a.active{background:#fbe8ef;color:#862f4e}
+.dash[data-admin-theme="light"] .adminPrimary{background:#8d3655;color:#fff}
+.dash[data-admin-theme="light"] .adminPrimary:hover{background:#6f2842}
+.dash[data-admin-theme="dark"] .adminSidebar nav a.active{background:#442d3c;color:#f6b7cc}
+.dash[data-admin-theme="dark"] .kpis article,.dash[data-admin-theme="dark"] .adminPanel{box-shadow:0 8px 26px rgba(0,0,0,.1)}
