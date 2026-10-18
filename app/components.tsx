@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import {usePathname,useSearchParams} from 'next/navigation';
-import {Search,Heart,ShoppingBag,User,Menu,ArrowRight,Truck,PackageCheck,Headphones,X,Languages} from 'lucide-react';
+import {Search,Heart,ShoppingBag,User,Menu,ArrowRight,Truck,PackageCheck,Headphones,X,Languages,Palette,ChevronDown} from 'lucide-react';
 import {useEffect,useState} from 'react';
 import {usePreferences} from './preferences';
 import type {Product} from './data';
@@ -26,6 +26,9 @@ export function Header(){
       <Link href="/" className="brand" aria-label={'Topuria Premium — '+t('home')}><b>TOPURIA</b><small>PREMIUM</small></Link>
       <nav aria-label={t('collections')}>{nav.map(n=><Link key={n.href} href={n.href} aria-current={active(n.category)?'page':undefined}>{n.name}</Link>)}</nav>
       <div className="actions"><div className="tpPref"><Languages size={16}/><select aria-label={t('language')} value={lang} onChange={e=>setLang(e.target.value as typeof lang)}><option value="ka">KA</option><option value="en">EN</option><option value="ru">RU</option></select></div>
+      <div className="tpThemeSwitch" role="group" aria-label={t('theme')}>
+        {(['burgundy','light','dark'] as const).map(v=><button key={v} type="button" className={'tpThemeDot tpThemeDot--'+v+(theme===v?' isActive':'')} aria-label={t(v==='burgundy'?'themeBurgundy':v==='light'?'themeLight':'themeDark')} title={t(v==='burgundy'?'themeBurgundy':v==='light'?'themeLight':'themeDark')} aria-pressed={theme===v} onClick={()=>setTheme(v)}><span/></button>)}
+      </div>
       <Link aria-label={t('search')} href="/search"><Search/></Link>
       <Link aria-label={t('account')} href="/account" className="desktopIcon"><User/></Link>
       <Link aria-label={t('wishlist')} href="/wishlist" className="desktopIcon iconCount"><Heart/><em>{wishlist.length||''}</em></Link>
