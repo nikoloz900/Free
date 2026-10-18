@@ -18,7 +18,9 @@ export function Header(){
   useEffect(()=>setOpen(false),[pathname]);
   useEffect(()=>{if(!open)return;const close=(e:KeyboardEvent)=>{if(e.key==='Escape')setOpen(false)};
     document.addEventListener('keydown',close);return()=>document.removeEventListener('keydown',close)},[open]);
+  const previewText=lang==='en'?'PREVIEW MODE · Our online store is being prepared. Online orders and payments are not available yet.':lang==='ru'?'ТЕСТОВЫЙ РЕЖИМ · Интернет-магазин готовится к запуску. Онлайн-заказы и оплата пока недоступны.':'სატესტო რეჟიმი · ჩვენი ონლაინ მაღაზია მზადების პროცესშია. ონლაინ შეკვეთები და გადახდა ჯერ მიუწვდომელია.';
   return <>
+    <div role="status" aria-label={lang==='ka'?'საიტის სტატუსი':'Store status'} style={{background:'#6e2637',color:'#fff8f3',padding:'11px 18px',textAlign:'center',fontSize:'clamp(11px, 1.1vw, 13px)',fontWeight:500,lineHeight:1.65,letterSpacing:'.015em'}}><span aria-hidden="true" style={{marginRight:8}}>✦</span>{previewText}<span aria-hidden="true" style={{marginLeft:8}}>✦</span></div>
     <header className="header">
       <button aria-label={t('menu')} aria-expanded={open} aria-controls="store-menu" className="icon mobile" onClick={()=>setOpen(true)}><Menu/></button>
       <Link href="/" className="brand" aria-label={'Topuria Premium — '+t('home')}><b>TOPURIA</b><small>PREMIUM</small></Link>
