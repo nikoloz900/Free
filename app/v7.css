@@ -374,3 +374,24 @@ body{font-family:var(--font-poppins);background:var(--ivory)}button,a,input,sele
 .dash .dateTabs{border-radius:10px}
 .dash .overviewTable th{font-size:11px}
 @media(max-width:680px){.dash .kpis article{min-height:120px;padding:16px}.dash .adminPanel{padding:17px}}
+
+/* Premium commerce dashboard V8 — responsive, data-driven and admin-only. */
+.dash .commerceInsights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:0 0 22px}
+.dash .commerceMetric{padding:19px 22px;border-radius:14px}
+.dash .commerceMetricHead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.dash .commerceMetricHead>span{display:flex;align-items:center;gap:9px;color:var(--admin-muted);font-size:12px}
+.dash .commerceMetricHead svg{color:#bd7893}
+.dash .commerceMetricHead>b{font-size:23px;font-weight:600;color:var(--admin-text)}
+.dash .commerceMetric>small{display:block;color:var(--admin-muted);font-size:11px;margin-top:8px}
+.dash .commerceChart{margin-bottom:22px;border-radius:16px;padding:28px}
+.dash .commerceChart .revenueChart{min-height:290px}
+.dash .commerceChart .chartBody{margin-top:18px}
+.dash .commerceMainGrid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:0 0 22px}
+.dash .commerceMainGrid>.adminPanel{border-radius:15px;min-width:0}
+.dash .commerceMainGrid .funnelSteps{grid-template-columns:repeat(3,minmax(0,1fr))}
+.dash .commerceMainGrid .topProductRow{padding:13px 0}
+.dash .commerceMainGrid .topProductRow .rank{color:#b76b88}
+.dash .commerceMainGrid .panelNote{font-size:10px;line-height:1.7}
+.dash .commerceChart .chartControls .segmented button.active,.dash .dateTabs .active{color:var(--admin-accent)}
+@media(max-width:1050px){.dash .commerceMainGrid{grid-template-columns:1fr}.dash .commerceInsights{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.dash .commerceInsights{grid-template-columns:1fr}.dash .commerceChart{padding:16px}.dash .commerceMainGrid .funnelSteps{grid-template-columns:1fr}}
