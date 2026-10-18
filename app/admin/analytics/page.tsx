@@ -7,7 +7,7 @@ import {money} from '../../../lib/format';
 import AdminNav from '../_nav';
 import RevenueChart from '../revenue-chart';
 export default async function Analytics({searchParams}:{searchParams:Promise<{days?:string}>}){
-  const admin=await getAdmin();if(!admin)redirect('/admin/login');if(!admin.viewStatistics)redirect('/admin/dashboard');
+  const admin=await getAdmin();if(!admin)redirect('/admin/login');if(admin.role!=='ADMIN'&&!admin.viewStatistics)redirect('/admin/dashboard');
   const sp=await searchParams;const days=sp.days==='7'?7:sp.days==='90'?90:30;const m=await getMetrics(days);
   const kpis=[{label:'ვიზიტის სესიები',value:m.sessions,note:'უნიკალური სესიები',icon:Users},{label:'პროდუქტის ნახვები',value:m.productViews,note:m.cartAdds+' კალათაში დამატება',icon:MousePointer},
     {label:'საშუალო შეკვეთა',value:money(m.averageOrder),note:m.validOrders+' გაუუქმებელი შეკვეთა',icon:ShoppingCart},{label:'ჩაბარებული გაყიდვები',value:money(m.revenue),note:admin.viewCost?'მოგება: '+money(m.profit):'ჩაბარებული შეკვეთები',icon:Wallet}];
