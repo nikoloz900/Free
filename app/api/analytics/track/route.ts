@@ -20,7 +20,9 @@ export async function POST(req:Request){
     if(current.count>=60||limits.size>=10000)return NextResponse.json({error:'Too many events'},{status:429});
     current.count++;limits.set(x.sessionId,current);
     if(x.productSlug&&!(await db.product.findFirst({where:{slug:x.productSlug,status:'ACTIVE'},select:{id:true}})))return NextResponse.json({error:'Unknown product'},{status:400});
-    await db.analyticsEvent.create({data:{type:x.type,path:x.path,productSlug:x.productSlug||null,sessionId:x.sessionId,
+    const geoCountry=req.headers.get('x-vercel-ip-country')?.toUpperCase();
+    const country=geoCountry&&/^[A-Z]{2}$/.test(geoCountry)?geoCountry:null;
+    await db.analyticsEvent.create({data:{country,type:x.type,path:x.path,productSlug:x.productSlug||null,sessionId:x.sessionId,
       source:sources.has(x.source)?x.source:'Other',device:x.device==='Mobile'?'Mobile':'Desktop'}});
     return NextResponse.json({ok:true});
   }catch{return NextResponse.json({error:'Tracking unavailable'},{status:503})}
