@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import {usePathname,useSearchParams} from 'next/navigation';
-import {Search,Heart,ShoppingBag,User,Menu,ArrowRight,Truck,PackageCheck,Headphones,X,Languages} from 'lucide-react';
+import {Search,Heart,ShoppingBag,User,Menu,ArrowRight,Truck,PackageCheck,Headphones,X,Languages,Palette,ChevronDown} from 'lucide-react';
 import {useEffect,useState} from 'react';
 import {usePreferences} from './preferences';
 import type {Product} from './data';
@@ -26,6 +26,9 @@ export function Header(){
       <Link href="/" className="brand" aria-label={'Topuria Premium — '+t('home')}><b>TOPURIA</b><small>PREMIUM</small></Link>
       <nav aria-label={t('collections')}>{nav.map(n=><Link key={n.href} href={n.href} aria-current={active(n.category)?'page':undefined}>{n.name}</Link>)}</nav>
       <div className="actions"><div className="tpPref"><Languages size={16}/><select aria-label={t('language')} value={lang} onChange={e=>setLang(e.target.value as typeof lang)}><option value="ka">KA</option><option value="en">EN</option><option value="ru">RU</option></select></div>
+      <div className="tpThemeSwitch" role="group" aria-label={t('theme')}>
+        {(['burgundy','light','dark'] as const).map(v=><button key={v} type="button" className={'tpThemeDot tpThemeDot--'+v+(theme===v?' isActive':'')} aria-label={t(v==='burgundy'?'themeBurgundy':v==='light'?'themeLight':'themeDark')} title={t(v==='burgundy'?'themeBurgundy':v==='light'?'themeLight':'themeDark')} aria-pressed={theme===v} onClick={()=>setTheme(v)}><span/></button>)}
+      </div>
       <Link aria-label={t('search')} href="/search"><Search/></Link>
       <Link aria-label={t('account')} href="/account" className="desktopIcon"><User/></Link>
       <Link aria-label={t('wishlist')} href="/wishlist" className="desktopIcon iconCount"><Heart/><em>{wishlist.length||''}</em></Link>
@@ -62,4 +65,4 @@ export function ProductCard({p}:{p:Product}){
     <b>{p.oldPrice!==undefined&&<del>₾{p.oldPrice}</del>} {money(p.price)}</b></Link></article>;
 }
 export function Benefits(){const {t}=usePreferences();return <section className="benefits"><div><Truck/><span><b>{t('shipping')}</b><small>{t('shippingSub')}</small></span></div><div><PackageCheck/><span><b>{t('returnTitle')}</b><small>{t('returnSub')}</small></span></div><div><Headphones/><span><b>{t('support')}</b><small>{t('supportSub')}</small></span></div></section>}
-export function Footer(){const {theme,setTheme,t}=usePreferences();return <footer className="v7Footer"><div className="footerBrand"><b>TOPURIA</b><span>PREMIUM</span></div><div><b>{t('store')}</b><span>{t('storeAddress')}</span><span>11:00–20:00</span></div><div><b>{t('collections')}</b><Link href="/shop">{t('all')}</Link><Link href="/wishlist">{t('wishlist')}</Link></div><div><b>{t('yourStyle')}</b><select aria-label={t('theme')} value={theme} onChange={e=>setTheme(e.target.value as typeof theme)}><option value="burgundy">{t('themeBurgundy')}</option><option value="light">{t('themeLight')}</option><option value="dark">{t('themeDark')}</option></select></div><div className="footerBottom">© {new Date().getFullYear()} Topuria Premium <span>{t('tbilisiGeorgia')}</span></div></footer>}
+export function Footer(){const {t}=usePreferences();return <footer className="v7Footer"><div className="footerBrand"><b>TOPURIA</b><span>PREMIUM</span></div><div><b>{t('store')}</b><span>{t('storeAddress')}</span><span>11:00–20:00</span></div><div><b>{t('collections')}</b><Link href="/shop">{t('all')}</Link><Link href="/wishlist">{t('wishlist')}</Link></div><div className="footerBottom">© {new Date().getFullYear()} Topuria Premium <span>{t('tbilisiGeorgia')}</span></div></footer>}

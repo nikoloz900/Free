@@ -490,3 +490,15 @@ body{font-family:var(--font-poppins);background:var(--ivory)}button,a,input,sele
 :root[data-theme="burgundy"] .v7Store.directCatalog .drawer {
   background:#faf6f3;color:#34252a;
 }
+
+/* Compact, premium storefront theme control next to language picker */
+.v7Store .tpThemeSwitch{display:inline-flex;align-items:center;gap:5px;padding:5px 7px;border:1px solid rgba(140,140,140,.42);border-radius:999px;background:rgba(130,130,130,.08);flex-shrink:0}
+.v7Store .tpThemeDot{display:grid;place-items:center;width:23px;height:23px;padding:0;border:1px solid transparent;border-radius:50%;background:transparent;cursor:pointer;transition:background .18s,transform .18s}
+.v7Store .tpThemeDot:hover{transform:scale(1.12);background:rgba(140,140,140,.15)}
+.v7Store .tpThemeDot span{width:15px;height:15px;border-radius:50%;border:1px solid rgba(125,125,125,.45);display:block}
+.v7Store .tpThemeDot--burgundy span{background:#78283e}
+.v7Store .tpThemeDot--light span{background:#fff}
+.v7Store .tpThemeDot--dark span{background:#101010}
+.v7Store .tpThemeDot.isActive{outline:2px solid currentColor;outline-offset:0}
+.v7Store .tpThemeDot:focus-visible{outline:2px solid currentColor;outline-offset:1px}
+@media(max-width:720px){.v7Store .tpThemeSwitch{gap:2px;padding:3px 4px}.v7Store .tpThemeDot{width:20px;height:20px}.v7Store .tpThemeDot span{width:13px;height:13px}}
