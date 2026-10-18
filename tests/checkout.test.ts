@@ -75,6 +75,7 @@ async function product(data: Partial<Prisma.ProductUncheckedCreateInput> = {}) {
   return db.product.create({data: {
     name: 'Checkout validation only', slug: 'checkout-' + id, sku: 'CHECKOUT-' + id,
     category: 'checkout-active', price: 120, salePrice: 100, cost: 40, stock: 5, sizes: 'S, M', ...data,
+    sizeStock: data.sizeStock ?? JSON.stringify({S:0,M:data.stock??5}),
   }});
 }
 function input(slug: string, extra: Record<string, unknown> = {}) {
@@ -485,4 +486,15 @@ test('Production verified payment allows fulfillment while legacy order edits re
   const legacy = await db.order.create({data: {orderNo: 'LEGACY-' + randomUUID(), customerName: 'Legacy local fixture', phone: 'test', total: 100}});
   assert.equal((await updateAdminOrder(legacy.id, {status: 'CANCELLED'})).status, 'CANCELLED');
   assert.equal(await stock(p.id), 4);
+});
+
+test('Per-size checkout cannot oversell a size even when product total is sufficient', async () => {
+  const p=await product({stock:4,sizeStock:JSON.stringify({S:3,M:1})}),bank=harness();
+  await assert.rejects(bank.service.startCheckout(input(p.slug,{items:[{slug:p.slug,size:'M',qty:2}],expectedTotalMinor:20000})),status(409));
+  assert.equal(await stock(p.id),4);
+  await bank.service.startCheckout(input(p.slug));
+  const current=await db.product.findUniqueOrThrow({where:{id:p.id}});
+  assert.equal(current.stock,3);
+  assert.deepEqual(JSON.parse(current.sizeStock||'{}'),{S:3,M:0});
+  await assert.rejects(bank.service.startCheckout(input(p.slug)),status(409));
 });

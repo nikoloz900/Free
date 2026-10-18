@@ -2,7 +2,7 @@
 export type Product = {
   slug: string; name: string; ka: string; price: number; oldPrice?: number;
   tone: string; categories: string[]; category: string; categoryName: string;
-  imageUrl: string; stock: number; sizes: string[]; colors: string[]; description: string;
+  imageUrl: string; stock: number; sizeStock: Record<string,number>|null; sizes: string[]; colors: string[]; description: string;
 };
 export type Category = { slug: string; name: string; description: string; translations?: Partial<Record<'ka'|'en'|'ru',string>> };
 export type Catalog = { products: Product[]; categories: Category[] };
