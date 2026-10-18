@@ -6,7 +6,7 @@ import {LayoutDashboard,Layers,ShoppingBag,ShoppingCart,ChartNoAxesCombined,User
 const icons={dashboard:LayoutDashboard,categories:Layers,products:ShoppingBag,orders:ShoppingCart,analytics:ChartNoAxesCombined,users:Users,customers:UserRound};
 type Nav={id:string;label:string;href:string};
 export default function AdminChrome({active,links,name,role}:{active:string;links:Nav[];name:string;role:string}){
-  const router=useRouter();const [open,setOpen]=useState(false),[light,setLight]=useState(false),[query,setQuery]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
+  const router=useRouter();const [open,setOpen]=useState(false),[light,setLight]=useState(true),[query,setQuery]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
   useEffect(()=>{try{setLight(localStorage.getItem('tp-admin-theme')==='light')}catch{}},[]);
   useEffect(()=>{const shell=document.querySelector('.dash');shell?.setAttribute('data-admin-theme',light?'light':'dark');try{localStorage.setItem('tp-admin-theme',light?'light':'dark')}catch{}},[light]);
   useEffect(()=>{const close=(e:KeyboardEvent)=>{if(e.key==='Escape')setOpen(false)};window.addEventListener('keydown',close);return()=>window.removeEventListener('keydown',close)},[]);
