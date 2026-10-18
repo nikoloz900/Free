@@ -132,6 +132,7 @@ model AnalyticsEvent {
   productSlug String?
   sessionId   String?
   source      String?  @default("Direct")
+  country     String?
   device      String?  @default("Desktop")
   value       Int      @default(0)
   createdAt   DateTime @default(now())
