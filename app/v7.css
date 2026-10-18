@@ -438,3 +438,55 @@ body{font-family:var(--font-poppins);background:var(--ivory)}button,a,input,sele
 .dash .countryItem b{min-width:27px;text-align:right;font-size:13px}
 .dash .countryItem>small{min-width:40px;text-align:right;color:var(--admin-muted)}
 @media(max-width:850px){.dash .countryGrid{grid-template-columns:1fr}}
+
+
+/* Three deliberately distinct customer-facing palettes. Admin styling is unaffected. */
+:root[data-theme="light"] .v7Store.directCatalog {
+  --ivory:#ffffff;--ink:#202020;--muted:#696969;--line:#e8e8e8;
+  --wine:#353535;--store-button:#252525;--store-button-hover:#111111;
+  --store-on-button:#ffffff;--store-surface:#f6f6f6;
+  --store-accent-soft:#f0f0f0;--store-accent-line:#d9d9d9;
+  background:#ffffff;color:var(--ink);
+}
+:root[data-theme="light"] .v7Store.directCatalog .header,
+:root[data-theme="light"] .v7Store.directCatalog .v7Footer,
+:root[data-theme="light"] .v7Store.directCatalog .drawer {
+  background:#ffffff;color:#202020;
+}
+:root[data-theme="light"] .v7Store.directCatalog .header {
+  box-shadow:inset 0 2px 0 #d5d5d5;
+}
+:root[data-theme="dark"] .v7Store.directCatalog {
+  --ivory:#090909;--ink:#f6f6f6;--muted:#b0b0b0;--line:#303030;
+  --wine:#f1f1f1;--store-button:#eeeeee;--store-button-hover:#cfcfcf;
+  --store-on-button:#101010;--store-surface:#181818;
+  --store-accent-soft:#222222;--store-accent-line:#484848;
+  background:#090909;color:var(--ink);
+}
+:root[data-theme="dark"] .v7Store.directCatalog .header,
+:root[data-theme="dark"] .v7Store.directCatalog .v7Footer,
+:root[data-theme="dark"] .v7Store.directCatalog .drawer {
+  background:#101010;color:#f6f6f6;
+}
+:root[data-theme="dark"] .v7Store.directCatalog .header {
+  box-shadow:inset 0 2px 0 #555555;
+}
+:root[data-theme="dark"] .v7Store.directCatalog .brand,
+:root[data-theme="dark"] .v7Store.directCatalog .brand b,
+:root[data-theme="dark"] .v7Store.directCatalog .brand small,
+:root[data-theme="dark"] .v7Store.directCatalog .footerBrand b,
+:root[data-theme="dark"] .v7Store.directCatalog .footerBrand span {
+  color:#f6f6f6;
+}
+:root[data-theme="burgundy"] .v7Store.directCatalog {
+  --ivory:#faf6f3;--ink:#34252a;--muted:#817178;--line:#e9dfe1;
+  --wine:#78283e;--store-button:#78283e;--store-button-hover:#5e1d30;
+  --store-on-button:#ffffff;--store-surface:#f3e9eb;
+  --store-accent-soft:#f6e7ec;--store-accent-line:#dfb9c5;
+  background:var(--ivory);color:var(--ink);
+}
+:root[data-theme="burgundy"] .v7Store.directCatalog .header,
+:root[data-theme="burgundy"] .v7Store.directCatalog .v7Footer,
+:root[data-theme="burgundy"] .v7Store.directCatalog .drawer {
+  background:#faf6f3;color:#34252a;
+}
