@@ -72,7 +72,7 @@ export default function CheckoutPage() {
 
   const rows = cart.map(item => ({item, product: products.find(product => product.slug === item.slug)}));
   const totalMinor = rows.reduce((sum, row) => sum + (row.product ? row.product.price * 100 * row.item.qty : 0), 0);
-  const invalidCart = rows.some(({item, product}) => !product || product.stock < cart.filter(row => row.slug === item.slug).reduce((sum, row) => sum + row.qty, 0)
+  const invalidCart = rows.some(({item, product}) => !product || (product.sizes.length ? item.qty > (product.sizeStock?.[item.size]??0) : product.stock < cart.filter(row => row.slug === item.slug).reduce((sum, row) => sum + row.qty, 0))
     || (product.sizes.length > 0 && !product.sizes.includes(item.size)));
   const available = Boolean(config?.enabled && config.methods.some(item => item.id === method && item.enabled));
   const pendingPath = attempt?.id && attempt.token ? returnPath(attempt.id, attempt.token) : null;
