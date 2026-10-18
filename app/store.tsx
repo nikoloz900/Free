@@ -14,16 +14,16 @@ export function StoreProvider({children}:{children:React.ReactNode}){const {prod
  useEffect(()=>{if(ready)try{localStorage.setItem('tp-cart',JSON.stringify(cart))}catch{}},[cart,ready]);useEffect(()=>{if(ready)try{localStorage.setItem('tp-wishlist',JSON.stringify(wishlist))}catch{}},[wishlist,ready]);
  const add=(slug:string,size='',qty=1)=>{
   const p=products.find(p=>p.slug===slug);if(!p||p.stock<=0||!Number.isInteger(qty)||qty<=0||(p.sizes.length>0&&!p.sizes.includes(size)))return;
-  setCart(c=>{const existing=c.filter(i=>i.slug===slug).reduce((s,i)=>s+i.qty,0);const count=Math.min(qty,p.stock-existing);if(count<=0)return c;
+  setCart(c=>{const existing=c.filter(i=>i.slug===slug&&(p.sizes.length===0||i.size===size)).reduce((s,i)=>s+i.qty,0);const count=Math.min(qty,(p.sizes.length?(p.sizeStock?.[size]??0):p.stock)-existing);if(count<=0)return c;
    const i=c.findIndex(x=>x.slug===slug&&x.size===size);return i<0?[...c,{slug,size,qty:count}]:c.map((x,n)=>n===i?{...x,qty:x.qty+count}:x)});
-  if(cart.filter(i=>i.slug===slug).reduce((s,i)=>s+i.qty,0)<p.stock)track('add_to_cart',slug);
+  if(cart.filter(i=>i.slug===slug&&(p.sizes.length===0||i.size===size)).reduce((s,i)=>s+i.qty,0)<(p.sizes.length?(p.sizeStock?.[size]??0):p.stock))track('add_to_cart',slug);
  };
  const remove=(slug:string,size?:string)=>setCart(c=>c.filter(x=>!(x.slug===slug&&(!size||x.size===size))));
  const setQty=(slug:string,size:string,qty:number)=>{
   if(!Number.isInteger(qty))return;if(qty<=0){remove(slug,size);return}
   const p=products.find(p=>p.slug===slug);if(!p)return;
-  setCart(c=>{const others=c.filter(i=>i.slug===slug&&i.size!==size).reduce((s,i)=>s+i.qty,0);
-   const count=Math.max(0,Math.min(qty,p.stock-others));return c.map(x=>x.slug===slug&&x.size===size?{...x,qty:count}:x).filter(x=>x.qty>0)});
+  setCart(c=>{const others=p.sizes.length?0:c.filter(i=>i.slug===slug&&i.size!==size).reduce((s,i)=>s+i.qty,0);
+   const count=Math.max(0,Math.min(qty,(p.sizes.length?(p.sizeStock?.[size]??0):p.stock)-others));return c.map(x=>x.slug===slug&&x.size===size?{...x,qty:count}:x).filter(x=>x.qty>0)});
  };
  const toggleWish=(slug:string)=>setWishlist(w=>w.includes(slug)?w.filter(x=>x!==slug):[...w,slug]);
  const clearPurchased=(items:CartItem[])=>setCart(current=>{
