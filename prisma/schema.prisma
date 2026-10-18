@@ -55,6 +55,7 @@ model Product {
   description String @default("")
   imageUrl String @default("")
   sizes String @default("")
+  sizeStock String?
   colors String @default("")
   price     Int
   salePrice Int?
