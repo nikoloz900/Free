@@ -13,7 +13,7 @@ export default function Shop({home=false}:{home?:boolean}){
  const go=(key:string)=>{router.push((home?'/':'/shop')+'?category='+encodeURIComponent(key));setFilter(false)};
  const options=[{slug:'all',name:t('allProducts')},...categories,{slug:'sale',name:'SALE'}];const sizes=[...new Set(products.flatMap(p=>p.sizes))];
  const title=category==='all'||category==='new'?t('newCollection'):category==='sale'?'SALE':categories.find(c=>c.slug===category)?.name||category;
- return <main className="v7Store directCatalog"><Header/><CatalogError/>
+ return <main className={`v7Store directCatalog${home ? " homeCatalog" : ""}`}><Header/><CatalogError/>
  <div className="shopLayout">{filter&&<><button className="catalogFilterBackdrop" aria-label={t('closeFilters')} onClick={()=>setFilter(false)}/><aside className="show catalogFilterPanel" role="dialog" aria-label={t('filters')} aria-modal="true"><div className="filterHead"><h3>{t('filters')}</h3><button autoFocus aria-label={t('closeFilters')} onClick={()=>setFilter(false)}><X size={20}/></button></div><h3>{t('category')}</h3>
  {options.map(c=><label key={c.slug}><input type="radio" name="category" checked={category===c.slug} onChange={()=>go(c.slug)}/>{c.name}</label>)}
  {sizes.length>0&&<><h3>{t('size')}</h3><div className="sizes">{sizes.map(s=><button key={s} aria-pressed={size===s} className={size===s?'active':''} onClick={()=>setSize(size===s?'':s)}>{s}</button>)}</div></>}
