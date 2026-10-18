@@ -15,7 +15,7 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
     admin.manageOrders?db.order.findMany({orderBy:{createdAt:'desc'},take:6,include:{items:{select:{name:true,quantity:true}}}}):Promise.resolve([]),
     admin.viewStatistics?getMetrics(days):Promise.resolve(null),
     db.product.count({where:{status:{not:'ACTIVE'}}}),
-    db.product.count({where:{OR:[{imageUrl:''},{imageUrl:{equals:''}}]}}),
+    db.product.count({where:{imageUrl:''}}),
     db.product.count({where:{status:'ACTIVE',stock:{lte:0}}}),
   ]);
   const change=metrics&&metrics.previousRevenue>0?(metrics.revenue-metrics.previousRevenue)/metrics.previousRevenue*100:null;
