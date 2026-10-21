@@ -510,3 +510,29 @@ body{font-family:var(--font-poppins);background:var(--ivory)}button,a,input,sele
 .productZoomTrigger{display:block;width:100%;padding:0;border:0;background:transparent;position:relative;cursor:zoom-in;text-align:inherit}.productZoomTrigger:disabled{cursor:default}.productZoomTrigger .fashion{width:100%}.productZoomHint{position:absolute;bottom:18px;right:18px;display:flex;gap:8px;align-items:center;background:#fffefa;color:#36121c;padding:10px 14px;border-radius:999px;font-size:12px;box-shadow:0 5px 25px #0002}.productZoomOverlay{position:fixed;inset:0;z-index:1000;background:rgba(8,5,7,.94);display:flex;align-items:center;justify-content:center;padding:40px 20px;cursor:zoom-out}.productZoomOverlay img{max-width:min(100%,1100px);max-height:90vh;object-fit:contain;cursor:default}.productZoomClose{position:absolute;right:20px;top:20px;border:1px solid #ffffff60;background:#ffffff20;color:#fff;border-radius:50%;width:46px;height:46px;display:grid;place-items:center;z-index:2}
 @media(max-width:800px){.boutiqueFooterTop{grid-template-columns:1fr}.boutiqueFooterIntro{padding:40px 24px}.boutiqueMap,.boutiqueMap iframe{min-height:260px}.boutiqueFooterLinks{grid-template-columns:repeat(2,minmax(0,1fr));gap:26px;padding:35px 24px!important}.boutiqueFooter .footerBottom{padding:20px 24px!important}.productZoomOverlay{padding:70px 12px 25px}}
 @media(max-width:480px){.boutiqueFooterLinks{grid-template-columns:1fr 1fr}.boutiqueFooterLinks .footerBrand{grid-column:1/-1}.productZoomHint{bottom:12px;right:12px}}
+
+/* Boutique catalog refinement — overrides legacy compact catalog rules */
+.v7Store.directCatalog{font-family:'Topuria Sans',sans-serif}
+.directCatalog .header nav{font-size:13px;font-weight:550;gap:22px}
+.directCatalog .announcement{font-size:11px;letter-spacing:.01em}
+.directCatalog .shopLayout{max-width:1510px;margin:0 auto}
+.directCatalog .directCatalogHeading{margin:38px 0 30px;align-items:flex-end}
+.directCatalog .directCatalogHeading>div:first-child{display:flex;align-items:flex-start;flex-direction:column;gap:8px}
+.directCatalog .directCatalogHeading h1{font-family:'Topuria Sans',sans-serif;font-size:clamp(28px,3vw,44px);line-height:1.28;font-weight:650;letter-spacing:-.045em;text-transform:none}
+.directCatalog .directCatalogHeading>div:first-child>span{font-size:12px;letter-spacing:.03em}
+.directCatalog .catalogBar button,.directCatalog .catalogBar select{font-size:12px;font-family:'Topuria Sans',sans-serif}
+.directCatalog .productGrid.three{grid-template-columns:repeat(4,minmax(0,1fr));gap:40px 19px}
+.directCatalog .productCard{min-width:0}
+.directCatalog .productImg{overflow:hidden;border-radius:5px;background:#f2eeeb}
+.directCatalog .productImg .fashion{aspect-ratio:3/4}
+.directCatalog .productCard:hover .fashion>img{transform:scale(1.065)}
+.directCatalog .productMeta{padding:16px 2px 0;gap:10px}
+.directCatalog .productMeta strong{font-family:'Topuria Sans',sans-serif;font-size:14px;font-weight:550;line-height:1.6}
+.directCatalog .productMeta>b{font-family:'Topuria Sans',sans-serif;font-size:13px;font-weight:650}
+.directCatalog .wish{border-radius:50%;width:36px;height:36px;top:12px;right:12px}
+.directCatalog .quick{font-size:12px}
+.directCatalog .boutiqueFooter{background:#210d14!important;padding:0!important;border:0}
+.directCatalog .boutiqueFooter .footerBrand b{font:500 28px/1.2 Georgia,serif;color:#fff}
+.directCatalog .boutiqueFooter .footerBrand span{color:#e0cfd2}
+@media(max-width:1050px){.directCatalog .productGrid.three{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){.directCatalog .directCatalogHeading{margin:24px 0}.directCatalog .directCatalogHeading h1{font-size:28px}.directCatalog .productGrid.three{grid-template-columns:repeat(2,minmax(0,1fr));gap:25px 12px}.directCatalog .productMeta strong{font-size:12px}.directCatalog .productMeta>b{font-size:12px}.directCatalog .catalogBar button,.directCatalog .catalogBar select{font-size:11px}}
