@@ -510,3 +510,33 @@ body{font-family:var(--font-poppins);background:var(--ivory)}button,a,input,sele
 .productZoomTrigger{display:block;width:100%;padding:0;border:0;background:transparent;position:relative;cursor:zoom-in;text-align:inherit}.productZoomTrigger:disabled{cursor:default}.productZoomTrigger .fashion{width:100%}.productZoomHint{position:absolute;bottom:18px;right:18px;display:flex;gap:8px;align-items:center;background:#fffefa;color:#36121c;padding:10px 14px;border-radius:999px;font-size:12px;box-shadow:0 5px 25px #0002}.productZoomOverlay{position:fixed;inset:0;z-index:1000;background:rgba(8,5,7,.94);display:flex;align-items:center;justify-content:center;padding:40px 20px;cursor:zoom-out}.productZoomOverlay img{max-width:min(100%,1100px);max-height:90vh;object-fit:contain;cursor:default}.productZoomClose{position:absolute;right:20px;top:20px;border:1px solid #ffffff60;background:#ffffff20;color:#fff;border-radius:50%;width:46px;height:46px;display:grid;place-items:center;z-index:2}
 @media(max-width:800px){.boutiqueFooterTop{grid-template-columns:1fr}.boutiqueFooterIntro{padding:40px 24px}.boutiqueMap,.boutiqueMap iframe{min-height:260px}.boutiqueFooterLinks{grid-template-columns:repeat(2,minmax(0,1fr));gap:26px;padding:35px 24px!important}.boutiqueFooter .footerBottom{padding:20px 24px!important}.productZoomOverlay{padding:70px 12px 25px}}
 @media(max-width:480px){.boutiqueFooterLinks{grid-template-columns:1fr 1fr}.boutiqueFooterLinks .footerBrand{grid-column:1/-1}.productZoomHint{bottom:12px;right:12px}}
+
+/* Premium home — isolated from shop, admin and product pages */
+.premiumHome .premiumHero{min-height:500px;display:grid;grid-template-columns:53% 47%;background:linear-gradient(112deg,#210c13 0%,#4b1826 62%,#260e17 100%);color:#fff;overflow:hidden}
+.premiumHeroCopy{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:clamp(40px,6vw,95px) clamp(28px,7vw,125px);gap:23px}
+.premiumHeroEyebrow{display:inline-flex;align-items:center;border:1px solid #c68b95;border-radius:999px;padding:10px 18px;background:#ffffff10;color:#f3d6da;font-size:12px;letter-spacing:.035em}
+.premiumHeroCopy h1{display:flex;flex-direction:column;gap:6px;margin:0;font-family:'Topuria Sans',sans-serif;letter-spacing:-.035em;line-height:1.2}
+.premiumHeroCopy h1 span{font-size:clamp(33px,3.7vw,62px);font-weight:700;color:#fff}
+.premiumHeroCopy h1 strong{font-size:clamp(28px,3.1vw,51px);font-weight:700;color:#dc8f9e}
+.premiumHeroCopy p{max-width:570px;margin:0;font-size:clamp(14px,1.1vw,18px);line-height:1.75;color:#f0dce0}
+.premiumHeroActions{display:flex;gap:14px;flex-wrap:wrap}
+.premiumHeroActions a{display:inline-flex;gap:12px;align-items:center;justify-content:center;padding:14px 20px;border-radius:999px;color:#fff!important;font-size:14px;font-weight:600;min-height:49px;text-decoration:none}
+.premiumHeroPrimary{background:#963547;border:1px solid #d66b80}.premiumHeroPrimary:hover{background:#b24458}
+.premiumHeroSecondary{background:#ffffff0a;border:1px solid #f2e4e5aa}.premiumHeroSecondary:hover{background:#ffffff24}
+.premiumHeroVisual{min-height:500px;position:relative;background:#24151b;overflow:hidden}
+.premiumHeroVisual .fashion{position:absolute;inset:0;width:100%;height:100%!important;aspect-ratio:auto!important;background:#24151b}
+.premiumHeroVisual .fashion img{width:100%;height:100%;object-fit:cover;object-position:center 25%}
+.premiumHeroVisual:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#280e18a6 0%,transparent 37%),linear-gradient(0deg,#170a10aa 0%,transparent 24%)}
+.premiumHeroPhotoNote{position:absolute;z-index:2;right:24px;bottom:22px;color:#fff;font-size:10px;letter-spacing:.18em}
+.premiumHeroMonogram{height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;font:45px Georgia,serif;color:#f8e7e8;letter-spacing:.2em}.premiumHeroMonogram span{font:12px 'Topuria Sans',sans-serif;letter-spacing:.5em;margin-top:14px}
+.premiumTrust{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:#fffaf7;padding:24px max(24px,7vw);border-bottom:1px solid #e9dfe0;gap:18px}
+.premiumTrust>div{display:flex;align-items:center;gap:15px;padding:5px 15px;border-right:1px solid #eadfe0}.premiumTrust>div:last-child{border:0}
+.premiumTrust svg{color:#ad344c;width:29px;height:29px;flex-shrink:0}.premiumTrust span{display:flex;flex-direction:column;gap:4px}.premiumTrust b{font-size:13px;font-weight:650;color:#25171b}.premiumTrust small{font-size:11px;color:#70636a}
+.premiumHome .shopLayout{padding-top:28px}.premiumHome .directCatalogHeading h1{font-size:clamp(24px,2.3vw,35px)}.premiumHome .directCatalogHeading>div:first-child>span{font-size:13px}
+.premiumHome .productGrid.three{grid-template-columns:repeat(3,minmax(0,1fr));gap:25px}
+.premiumHome .productImg{border-radius:9px}.premiumHome .productMeta strong{font-size:14px}.premiumHome .productMeta>b{font-size:13px}
+.premiumAllProducts{display:flex;align-items:center;justify-content:center;gap:12px;width:max-content;margin:35px auto 0;border:1px solid #9d3c50;color:#7d2639!important;border-radius:999px;padding:12px 24px;font-size:13px;font-weight:600}
+.premiumHome .boutiqueFooterTop{min-height:360px}
+@media(min-width:1200px){.premiumHome .productGrid.three{grid-template-columns:repeat(6,minmax(0,1fr));gap:16px}.premiumHome .productMeta{flex-direction:column;gap:4px}.premiumHome .productMeta strong{font-size:12px}.premiumHome .productMeta>b{font-size:12px}}
+@media(max-width:900px){.premiumHome .premiumHero{grid-template-columns:1fr 1fr;min-height:430px}.premiumHeroCopy{padding:35px 28px}.premiumHeroVisual{min-height:430px}.premiumTrust{grid-template-columns:repeat(2,minmax(0,1fr));padding:20px}.premiumTrust>div:nth-child(2){border-right:0}.premiumHome .productGrid.three{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:620px){.premiumHome .premiumHero{display:flex;flex-direction:column-reverse}.premiumHeroVisual{min-height:300px;height:300px}.premiumHeroCopy{padding:32px 24px 40px;gap:16px}.premiumHeroCopy h1 span{font-size:32px}.premiumHeroCopy h1 strong{font-size:27px}.premiumHeroActions a{font-size:12px;padding:11px 14px}.premiumTrust{gap:12px;padding:18px 12px}.premiumTrust>div{padding:4px 6px;gap:8px}.premiumTrust svg{width:23px;height:23px}.premiumTrust b{font-size:11px}.premiumTrust small{font-size:10px}.premiumHome .productGrid.three{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 12px}.premiumHome .shopLayout{padding-top:16px}}
