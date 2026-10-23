@@ -14,6 +14,7 @@ const terms: {ka: string; en: string; ru: string; aliases?: string[]}[] = [
   {ka:'ბლუზები',en:'Blouses',ru:'Блузки',aliases:['ბლუზა','ბლუზი','blouse','блузка']},
   {ka:'მაისურები',en:'T-shirts',ru:'Футболки',aliases:['მაისური','t-shirt','t shirts','t shirt','футболка']},
   {ka:'ტოპები',en:'Tops',ru:'Топы',aliases:['ტოპი','top','топ']},
+  {ka:'ზედა',en:'Tops',ru:'Топы',aliases:['ზედები']},
   {ka:'ბოდეები',en:'Bodysuits',ru:'Боди',aliases:['ბოდე','ბოდი','bodysuit']},
   {ka:'ჟაკეტები',en:'Jackets',ru:'Жакеты',aliases:['ჟაკეტი','жакет']},
   {ka:'კარდიგანები',en:'Cardigans',ru:'Кардиганы',aliases:['კარდიგანი','cardigan','кардиган']},
