@@ -19,6 +19,7 @@ const terms: {ka: string; en: string; ru: string; aliases?: string[]}[] = [
   {ka:'კარდიგანები',en:'Cardigans',ru:'Кардиганы',aliases:['კარდიგანი','cardigan','кардиган']},
   {ka:'პიჯაკები',en:'Blazers',ru:'Пиджаки',aliases:['პიჯაკი','blazer','пиджак']},
   {ka:'ქურთუკები',en:'Jackets',ru:'Куртки',aliases:['ქურთუკი','jacket','куртка']},
+  {ka:'ლაბადები',en:'Trench coats',ru:'Плащи',aliases:['ლაბადა','trench coat','trench coats','плащ','плащи']},
   {ka:'პალტოები',en:'Coats',ru:'Пальто',aliases:['პალტო','coat']},
   {ka:'მოსაცმელები',en:'Outerwear',ru:'Верхняя одежда',aliases:['მოსაცმელი','ზედა ტანსაცმელი']},
   {ka:'სვიტერები',en:'Sweaters',ru:'Свитеры',aliases:['სვიტერი','ჯემპრები','ჯემპრი','sweater','jumpers','свитер']},
