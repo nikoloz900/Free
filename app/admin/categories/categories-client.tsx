@@ -12,8 +12,18 @@ export default function CategoriesClient(){
  async function load(){try{const data=await adminRequest<{categories:Cat[];translationsReady:boolean}>('/api/admin/categories?translations=1');setItems(data.categories);setTranslationsReady(data.translationsReady)}catch(e){setError((e as Error).message)}finally{setLoading(false)}}
  useEffect(()=>{void load()},[]);
  function resetEditor(){setEditing(null);setForm(empty);setTranslations({});setTranslationEdits({})}
+ function updateName(name:string){
+  setForm(previous=>({...previous,name}));
+  if(editing!==null)return;
+  const suggestions:Translations={};
+  for(const locale of ['ka','en','ru'] as const){
+   const translated=translateCategoryName(name,locale);
+   if(name.trim()&&translated!==name.trim()&&!translationEdits[locale])suggestions[locale]=translated;
+  }
+  setTranslations(previous=>({...previous,...suggestions,...Object.fromEntries((['ka','en','ru'] as const).filter(locale=>!translationEdits[locale]&&!suggestions[locale]).map(locale=>[locale,'']))}));
+ }
  async function save(e:React.FormEvent){e.preventDefault();setBusy(true);setError('');setSuccess('');
-  try{const data={...form,id:editing,slug:form.slug||toSlug(form.name),...(translationsReady&&Object.keys(translationEdits).length?{translations:translationEdits}:{})};
+  try{const data={...form,id:editing,slug:form.slug||toSlug(form.name),...(translationsReady?{translations:{...translations,...translationEdits}}:{})};
    await adminRequest('/api/admin/categories',adminJson(editing?'PATCH':'POST',data));setSuccess(editing?'კატეგორია განახლდა.':'კატეგორია დაემატა.');resetEditor();await load();
   }catch(e){setError((e as Error).message)}finally{setBusy(false)}
  }
@@ -22,13 +32,13 @@ export default function CategoriesClient(){
  async function remove(c:Cat){if(!confirm('წავშალოთ კატეგორია „'+c.name+'“?'))return;setBusy(true);setError('');try{await adminRequest('/api/admin/categories?id='+c.id,{method:'DELETE'});setSuccess('კატეგორია წაიშალა.');await load()}catch(e){setError((e as Error).message)}finally{setBusy(false)}}
  return <>{error&&<p className="adminNotice error" role="alert">{error}</p>}{success&&<p className="adminNotice success" role="status">{success}</p>}
  <form id="category-editor" className="v5Panel" onSubmit={save}><div className="v5PanelHead"><h2>{editing?'კატეგორიის რედაქტირება':'ახალი კატეგორია'}</h2></div>
- <div className="v5Fields"><label>დასახელება<input required maxLength={200} value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></label>
+ <div className="v5Fields"><label>დასახელება<input required maxLength={200} value={form.name} onChange={e=>updateName(e.target.value)}/></label>
  <label>რიგითობა<input type="number" min={0} max={100000} step={1} value={form.sortOrder} onChange={e=>setForm({...form,sortOrder:Number(e.target.value)})}/></label>
  <label>მისამართი<input readOnly={editing!==null} pattern="[a-z0-9-]+" value={form.slug} placeholder={toSlug(form.name||'კატეგორია')} onChange={e=>setForm({...form,slug:e.target.value.toLowerCase()})}/></label></div>
  <fieldset className="categoryTranslations" disabled={!translationsReady||busy} aria-describedby="category-translations-help"><legend>დასახელებები ენების მიხედვით</legend>
  <div className="v5Fields">{languages.map(({locale,label})=><label key={locale}>{label}<input lang={locale} maxLength={200} value={translations[locale]??''} placeholder={translateCategoryName(form.name,locale)||label} onChange={e=>{setTranslations({...translations,[locale]:e.target.value});setTranslationEdits({...translationEdits,[locale]:e.target.value})}}/></label>)}</div>
  </fieldset>
- <p id="category-translations-help" className="categoryTranslationHint">{loading?'თარგმანების ველები იტვირთება…':translationsReady?'საკუთარი თარგმანი არასავალდებულოა. ცარიელი ველი გამოიყენებს ცნობილ თარგმანს ან ძირითად დასახელებას.':'ცნობილი კატეგორიები ავტომატურად ითარგმნება. ინდივიდუალური თარგმანების ველები ბაზის განახლების შემდეგ ჩაირთვება. სხვა მონაცემების შეცვლა ახლაც შეგიძლიათ.'}</p>
+ <p id="category-translations-help" className="categoryTranslationHint">{loading?'თარგმანების ველები იტვირთება…':translationsReady?'ცნობილი კატეგორიების თარგმანები ავტომატურად ივსება. შეგიძლიათ ხელით შეცვალოთ. უცნობი დასახელებები ხელით თარგმნეთ.':'ცნობილი კატეგორიები ავტომატურად ითარგმნება. ინდივიდუალური თარგმანების ველები ბაზის განახლების შემდეგ ჩაირთვება. სხვა მონაცემების შეცვლა ახლაც შეგიძლიათ.'}</p>
  <label className="v5Full">აღწერა<textarea rows={3} value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/></label>
  <label className="adminCheck"><input type="checkbox" checked={form.active} onChange={e=>setForm({...form,active:e.target.checked})}/>აქტიური კატეგორია</label>
  <div className="v5FormActions"><button className="v5Primary" disabled={busy}>{busy?'ინახება...':editing?'ცვლილებების შენახვა':'კატეგორიის დამატება'}</button>{editing&&<button type="button" onClick={resetEditor}>გაუქმება</button>}</div></form>
