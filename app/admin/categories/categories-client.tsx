@@ -13,14 +13,19 @@ export default function CategoriesClient(){
  useEffect(()=>{void load()},[]);
  function resetEditor(){setEditing(null);setForm(empty);setTranslations({});setTranslationEdits({})}
  function updateName(name:string){
+  const oldName=form.name;
   setForm(previous=>({...previous,name}));
-  if(editing!==null)return;
   const suggestions:Translations={};
   for(const locale of ['ka','en','ru'] as const){
-   const translated=translateCategoryName(name,locale);
-   if(name.trim()&&translated!==name.trim()&&!translationEdits[locale])suggestions[locale]=translated;
+   if(Object.prototype.hasOwnProperty.call(translationEdits,locale))continue;
+   const current=translations[locale]?.trim()||'';
+   const previousDefault=locale==='ka'?oldName.trim():translateCategoryName(oldName,locale);
+   // On rename, replace only generated/unchanged values. Preserve custom translations.
+   if(editing!==null&&current&&current!==previousDefault)continue;
+   const translated=locale==='ka'?name.trim():translateCategoryName(name,locale);
+   suggestions[locale]=name.trim()&&(locale==='ka'||translated!==name.trim())?translated:'';
   }
-  setTranslations(previous=>({...previous,...suggestions,...Object.fromEntries((['ka','en','ru'] as const).filter(locale=>!translationEdits[locale]&&!suggestions[locale]).map(locale=>[locale,'']))}));
+  setTranslations(previous=>({...previous,...suggestions}));
  }
  async function save(e:React.FormEvent){e.preventDefault();setBusy(true);setError('');setSuccess('');
   try{const data={...form,id:editing,slug:form.slug||toSlug(form.name),...(translationsReady?{translations:{...translations,...translationEdits}}:{})};
