@@ -22,7 +22,7 @@ export function useCatalog(){
   const c=useContext(Context);const {lang}=usePreferences();
   if(!c)throw new Error('CatalogProvider missing');
   const localized=useMemo(()=>{
-    const categories=c.categories.map(category=>({...category,name:translateCategoryName(category.name,lang,category.translations)}));
+    const categories=c.categories.map(category=>({...category,name:lang==='ka'?category.name:translateCategoryName(category.name,lang,category.translations)}));
     const names=new Map(categories.map(category=>[category.slug,category.name]));
     const products=c.products.map(product=>({...product,name:translateProductName(product.name,lang),ka:translateProductName(product.name,lang),categoryName:names.get(product.category)||translateCategoryName(product.categoryName,lang)}));
     return {categories,products};
