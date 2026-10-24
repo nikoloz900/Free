@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {usePathname,useSearchParams} from 'next/navigation';
 import {Search,Heart,ShoppingBag,User,Menu,ArrowRight,Truck,PackageCheck,Headphones,X,Languages,Palette,ChevronDown,MapPin,Instagram,Facebook,ExternalLink} from 'lucide-react';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {usePreferences} from './preferences';
 import type {Product} from './data';
 import {useStore} from './store';
@@ -11,7 +11,7 @@ import {useCatalog} from './catalog';
 import {money} from '../lib/format';
 import {translateProductName} from '../lib/category-labels';
 export function Header(){
-  const [open,setOpen]=useState(false);const pathname=usePathname();const params=useSearchParams();const {cartCount,wishlist}=useStore();
+  const [open,setOpen]=useState(false);const languageMenu=useRef<HTMLDetailsElement>(null);const pathname=usePathname();const params=useSearchParams();const {cartCount,wishlist}=useStore();
   const {lang,theme,setLang,setTheme,t}=usePreferences();const {categories}=useCatalog();
   const nav=[{name:t('new'),href:'/shop',category:'all'},...categories.slice(0,4).map(c=>({name:c.name,href:'/shop?category='+encodeURIComponent(c.slug),category:c.slug})),{name:'SALE',href:'/shop?category=sale',category:'sale'}];
   const currentCategory=params.get('category')||'all';const active=(key:string)=>['/','/shop'].includes(pathname)&&(currentCategory===key||(currentCategory==='new'&&key==='all'));
@@ -25,7 +25,14 @@ export function Header(){
       <button aria-label={t('menu')} aria-expanded={open} aria-controls="store-menu" className="icon mobile" onClick={()=>setOpen(true)}><Menu/></button>
       <Link href="/" className="brand" aria-label={'Topuria Premium — '+t('home')}><b>TOPURIA</b><small>PREMIUM</small></Link>
       <nav aria-label={t('collections')}>{nav.map(n=><Link key={n.href} href={n.href} aria-current={active(n.category)?'page':undefined}>{n.name}</Link>)}</nav>
-      <div className="actions"><div className="tpFlagSwitcher" role="group" aria-label={t('language')}>{(['ka','en','ru'] as const).map(code=><button key={code} type="button" className={'tpFlagButton'+(lang===code?' isActive':'')} aria-label={code==='ka'?'ქართული':code==='en'?'English':'Русский'} title={code==='ka'?'ქართული':code==='en'?'English':'Русский'} aria-pressed={lang===code} onClick={()=>setLang(code)}><span aria-hidden="true">{code==='ka'?'🇬🇪':code==='en'?'🇬🇧':'🇷🇺'}</span></button>)}</div>
+      <div className="actions"><details ref={languageMenu} className="tpLanguageMenu" style={{position:'relative',zIndex:60}}>
+        <summary aria-label={t('language')} title={t('language')} style={{display:'flex',alignItems:'center',gap:7,cursor:'pointer',listStyle:'none',padding:'8px 10px',border:'1px solid #d8c8c9',borderRadius:20,fontSize:17}}>
+          <span aria-hidden="true">{lang==='ka'?'🇬🇪':lang==='en'?'🇬🇧':'🇷🇺'}</span><ChevronDown size={13}/>
+        </summary>
+        <div role="group" aria-label={t('language')} style={{position:'absolute',top:'calc(100% + 7px)',right:0,display:'flex',flexDirection:'column',gap:3,padding:6,minWidth:126,background:'var(--bg, #fffaf8)',color:'var(--text, #21171a)',border:'1px solid #d8c8c9',borderRadius:12,boxShadow:'0 10px 28px #0002'}}>
+          {(['ka','en','ru'] as const).map(code=><button key={code} type="button" aria-pressed={lang===code} onClick={()=>{setLang(code);if(languageMenu.current)languageMenu.current.open=false}} style={{display:'flex',alignItems:'center',gap:10,padding:'9px 10px',width:'100%',textAlign:'left',border:0,borderRadius:7,background:lang===code?'#eee0e3':'transparent',color:lang===code?'#532132':'inherit',cursor:'pointer',whiteSpace:'nowrap'}}><span aria-hidden="true">{code==='ka'?'🇬🇪':code==='en'?'🇬🇧':'🇷🇺'}</span><span>{code==='ka'?'ქართული':code==='en'?'English':'Русский'}</span></button>)}
+        </div>
+      </details>
       <div className="tpThemeSwitch" role="group" aria-label={t('theme')}>
         {(['burgundy','light','dark'] as const).map(v=><button key={v} type="button" className={'tpThemeDot tpThemeDot--'+v+(theme===v?' isActive':'')} aria-label={t(v==='burgundy'?'themeBurgundy':v==='light'?'themeLight':'themeDark')} title={t(v==='burgundy'?'themeBurgundy':v==='light'?'themeLight':'themeDark')} aria-pressed={theme===v} onClick={()=>setTheme(v)}><span/></button>)}
       </div>
