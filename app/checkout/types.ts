@@ -3,7 +3,7 @@ export type CheckoutStatus = 'CREATING' | 'PENDING' | 'PAID' | 'FAILED' | 'EXPIR
 export type CheckoutConfig = {
   enabled: boolean;
   mode: 'sandbox' | 'production' | 'disabled';
-  delivery: {mode: 'pickup' | 'free'; label: string};
+  delivery: {mode: 'pickup' | 'free' | 'courier'; label: string};
   methods: {id: PaymentMethod; label: string; enabled: boolean}[];
   message?: string;
 };
