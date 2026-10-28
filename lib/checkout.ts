@@ -45,8 +45,9 @@ function parseInput(value: unknown, config: CheckoutConfig, replay = false): Inp
   if (name.length < 2 || !/^\+?\d{7,15}$/.test(phone)) throw new CheckoutError('შეიყვანეთ სახელი და სწორი ტელეფონის ნომერი.');
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new CheckoutError('შეიყვანეთ სწორი ელფოსტა.');
   if (x.delivery !== 'pickup' && x.delivery !== 'delivery') throw new CheckoutError('აირჩიეთ მიღების მეთოდი.');
-  if (!replay && x.delivery === 'delivery' && config.delivery !== 'free') throw new CheckoutError('ამ ეტაპზე ხელმისაწვდომია ადგილზე გატანა.');
+  if (!replay && x.delivery === 'delivery' && config.delivery !== 'free' && config.delivery !== 'courier') throw new CheckoutError('ამ ეტაპზე ხელმისაწვდომია ადგილზე გატანა.');
   const address = x.delivery === 'delivery' ? text(customer.address, 1000, true) : '';
+  if (x.delivery === 'delivery' && config.delivery === 'courier' && !/^თბილისი(?:\s|,|$)/iu.test(address)) throw new CheckoutError('კურიერით მიწოდება ამ ეტაპზე მხოლოდ თბილისშია ხელმისაწვდომი. მისამართი დაიწყეთ სიტყვით „თბილისი“.');
   if (x.delivery === 'delivery' && address.length < 10) throw new CheckoutError('შეიყვანეთ სრული მიწოდების მისამართი.');
   if (!config.methods.includes(x.method as CheckoutMethod)) throw new CheckoutError('გადახდის ეს მეთოდი ჯერ არ არის გააქტიურებული.');
   if (!Number.isSafeInteger(x.expectedTotalMinor) || Number(x.expectedTotalMinor) <= 0 || Number(x.expectedTotalMinor) > 100_000_000) throw new CheckoutError('შეკვეთის თანხა არასწორია.');
