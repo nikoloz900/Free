@@ -39,7 +39,7 @@ export function publicCheckoutConfig() {
   const config = checkoutConfig();
   return {
     enabled: config.enabled, mode: config.enabled ? config.mode : 'disabled',
-    delivery: {mode: config.delivery, label: config.delivery === 'courier' ? 'მიწოდების საფასური გადაიხდება კურიერთან' : config.delivery === 'free' ? 'უფასო მიწოდება' : 'ადგილზე გატანა · უფასო'},
+    delivery: {mode: config.delivery, label: config.delivery === 'courier' ? 'მიწოდების საფასურს გადაიხდით კურიერთან' : config.delivery === 'free' ? 'უფასო მიწოდება' : 'ადგილზე გატანა · უფასო'},
     methods: (Object.keys(methodLabels) as CheckoutMethod[]).map(id => ({id, label: methodLabels[id], enabled: config.enabled && config.methods.includes(id)})),
     ...(!config.enabled ? {message: 'ონლაინ გადახდა ჯერ არ არის გააქტიურებული. ბარათი, Apple Pay და ნაწილ-ნაწილ გადახდა ხელმისაწვდომი გახდება ბანკთან დაკავშირების შემდეგ.'} : {}),
   };
