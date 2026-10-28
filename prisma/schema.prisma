@@ -103,6 +103,8 @@ model Payment {
   stockReleased   Boolean  @default(false)
   expiresAt       DateTime
   paidAt          DateTime?
+  telegramClaimedAt DateTime?
+  telegramSentAt    DateTime?
   lastCheckedAt   DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

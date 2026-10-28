@@ -1,6 +1,7 @@
 import {createHash, createHmac, randomBytes, timingSafeEqual} from 'node:crypto';
 import {Prisma, PrismaClient} from '@prisma/client';
 import {parseSizeStock} from './size-stock';
+import {notifyPaidOrder} from './telegram-orders';
 import {BogError, createBogOrder, getBogOrder, type NormalizedBogOrder} from './bog';
 import {type CheckoutConfig, type CheckoutMethod} from './checkout-config';
 
@@ -150,7 +151,9 @@ export function createCheckoutService(db: PrismaClient, config: CheckoutConfig, 
         await tx.payment.update({where: {id}, data: {status: 'PENDING', rawStatus: receipt.rawStatus, lastCheckedAt: new Date()}});
       }
     });
-    return load(id);
+    const updated = await load(id);
+    if (updated.status === 'PAID') await notifyPaidOrder(id).catch(() => {});
+    return updated;
   }
   async function createProvider(id: string) {
     const row = await load(id);
@@ -273,7 +276,10 @@ export function createCheckoutService(db: PrismaClient, config: CheckoutConfig, 
     requireEnabled();
     let row = await load(id);
     if (!row.providerOrderId) return row.status === 'CREATING' ? createProvider(id) : row;
-    if (!force && (!pending.includes(row.status) || (row.lastCheckedAt && row.lastCheckedAt.getTime() > Date.now() - 5000))) return row;
+    if (!force && (!pending.includes(row.status) || (row.lastCheckedAt && row.lastCheckedAt.getTime() > Date.now() - 5000))) {
+      if (row.status === 'PAID') await notifyPaidOrder(id).catch(() => {});
+      return row;
+    }
     if (!force) {
       const claim = await db.payment.updateMany({where: {id, OR: [{lastCheckedAt: null}, {lastCheckedAt: {lt: new Date(Date.now() - 5000)}}]}, data: {lastCheckedAt: new Date()}});
       if (!claim.count) return load(id);
