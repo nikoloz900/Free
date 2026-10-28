@@ -29,6 +29,10 @@ export async function notifyPaidOrder(paymentId: string) {
     const message = [
       '🛍️ TOPURIA PREMIUM — გადახდილი შეკვეთა' + (payment.environment !== 'production' ? ' 🧪 TEST' : ''),
       '📦 შეკვეთა: ' + order.orderNo,
+      '👤 მომხმარებელი: ' + (order.customerName?.trim() || 'არ არის მითითებული'),
+      '📞 ტელეფონი: ' + (order.phone?.trim() || 'არ არის მითითებული'),
+      '📧 ელფოსტა: ' + (order.email?.trim() || 'არ არის მითითებული'),
+      '📍 მისამართი: ' + (order.address?.trim() || 'არ არის მითითებული'),
       ...lines,
       '💰 ჯამი: ' + (payment.amountMinor / 100).toFixed(2) + ' ₾',
       '💳 გადახდა: დადასტურებულია ✅',
