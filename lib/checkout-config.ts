@@ -4,7 +4,7 @@ export type CheckoutConfig = {
   mode: 'sandbox' | 'production';
   appUrl: string;
   secret: string;
-  delivery: 'pickup' | 'free';
+  delivery: 'pickup' | 'free' | 'courier';
   methods: CheckoutMethod[];
 };
 
@@ -32,14 +32,14 @@ export function checkoutConfig(): CheckoutConfig {
     // Sandbox must use a disposable DB/Neon branch on a Preview deployment.
     // This acknowledgement is deliberate; live Vercel Production is blocked.
     (mode !== 'sandbox' || (process.env.VERCEL_ENV !== 'production' && process.env.CHECKOUT_SANDBOX_ISOLATED === 'true'));
-  return {enabled, mode, appUrl, secret, delivery: process.env.CHECKOUT_DELIVERY === 'free' ? 'free' : 'pickup', methods};
+  return {enabled, mode, appUrl, secret, delivery: process.env.CHECKOUT_DELIVERY === 'free' ? 'free' : process.env.CHECKOUT_DELIVERY === 'pickup' ? 'pickup' : 'courier', methods};
 }
 
 export function publicCheckoutConfig() {
   const config = checkoutConfig();
   return {
     enabled: config.enabled, mode: config.enabled ? config.mode : 'disabled',
-    delivery: {mode: config.delivery, label: config.delivery === 'free' ? 'უფასო მიწოდება' : 'ადგილზე გატანა · უფასო'},
+    delivery: {mode: config.delivery, label: config.delivery === 'courier' ? 'მიწოდების საფასური გადაიხდება კურიერთან' : config.delivery === 'free' ? 'უფასო მიწოდება' : 'ადგილზე გატანა · უფასო'},
     methods: (Object.keys(methodLabels) as CheckoutMethod[]).map(id => ({id, label: methodLabels[id], enabled: config.enabled && config.methods.includes(id)})),
     ...(!config.enabled ? {message: 'ონლაინ გადახდა ჯერ არ არის გააქტიურებული. ბარათი, Apple Pay და ნაწილ-ნაწილ გადახდა ხელმისაწვდომი გახდება ბანკთან დაკავშირების შემდეგ.'} : {}),
   };
