@@ -6,9 +6,10 @@ export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
   const blocked = rejectCrossOrigin(req);
-  if (blocked) return blocked;
+  if (blocked) return NextResponse.json({error: 'Origin check failed'}, {status: 403});
   const admin = await getAdmin();
-  if (!admin || admin.role !== 'SUPER_ADMIN') return NextResponse.json({error: 'Forbidden'}, {status: 403});
+  if (!admin) return NextResponse.json({error: 'Admin session missing or invalid'}, {status: 401});
+  if (admin.role !== 'SUPER_ADMIN') return NextResponse.json({error: 'SUPER_ADMIN role required'}, {status: 403});
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
   if (!token || !chatId) return NextResponse.json({error: 'Telegram is not configured'}, {status: 503});
