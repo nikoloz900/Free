@@ -1,5 +1,6 @@
 import './styles.css';
 import './v7.css';
+import './category-menu.css';
 import type { Metadata } from 'next';
 import {StoreProvider} from './store';
 import {PreferencesProvider} from './preferences';
