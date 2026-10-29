@@ -16,3 +16,14 @@
 @media(max-width:900px){.tpDesktopNav .tpCategoryDropdown{display:none}}
 @media(max-width:650px){.tpCategoryGrid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.tpCategoryPanel,.tpCategoryTrigger svg{transition:none}}
+
+/* Compact anchored menu: never overflow the left edge of the viewport */
+.header{overflow:visible!important}
+.tpDesktopNav{position:relative;overflow:visible!important}
+.tpCategoryDropdown{position:relative}
+.tpCategoryPanel{left:0!important;right:auto!important;top:calc(100% + 2px)!important;transform:translateY(8px)!important;width:min(410px,calc(100vw - 32px))!important;max-height:min(65vh,500px);padding:16px!important;border-radius:14px!important;box-sizing:border-box}
+.tpCategoryDropdown:hover .tpCategoryPanel,.tpCategoryDropdown:focus-within .tpCategoryPanel{transform:translateY(0)!important}
+.tpCategoryGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 8px}
+.tpCategoryGrid a{padding:10px 11px!important;font-size:13px!important;min-width:0}
+.tpCategoryPanelHeading{font-size:14px;padding:0 2px 10px;margin-bottom:8px}
+@media(max-width:900px){.tpCategoryPanel{display:none!important}}
