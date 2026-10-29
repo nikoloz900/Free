@@ -1,0 +1,18 @@
+/* Topuria Premium: accessible category mega-menu */
+.tpDesktopNav{overflow:visible!important;align-items:center}
+.tpCategoryDropdown{position:relative;display:flex;align-items:center;align-self:stretch}
+.tpCategoryTrigger{display:inline-flex;align-items:center;gap:7px;background:transparent;border:0;color:inherit;font:inherit;font-size:inherit;font-weight:inherit;cursor:pointer;padding:10px 5px;white-space:nowrap;transition:color .2s ease}
+.tpCategoryTrigger:hover,.tpCategoryDropdown:focus-within .tpCategoryTrigger{color:#9b425e}
+.tpCategoryTrigger svg{transition:transform .2s ease}
+.tpCategoryDropdown:hover .tpCategoryTrigger svg,.tpCategoryDropdown:focus-within .tpCategoryTrigger svg{transform:rotate(180deg)}
+.tpCategoryPanel{position:absolute;z-index:100;top:calc(100% - 2px);left:50%;transform:translate(-50%,9px);width:min(620px,calc(100vw - 32px));max-height:min(70vh,540px);overflow:auto;padding:22px;background:var(--bg,#fffaf8);color:var(--text,#251b20);border:1px solid rgba(135,71,91,.2);border-radius:18px;box-shadow:0 22px 65px rgba(30,14,22,.19);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,transform .18s ease,visibility .18s}
+.tpCategoryDropdown:hover .tpCategoryPanel,.tpCategoryDropdown:focus-within .tpCategoryPanel{opacity:1;visibility:visible;pointer-events:auto;transform:translate(-50%,0)}
+.tpCategoryPanelHeading{display:flex;justify-content:space-between;align-items:center;padding:0 4px 14px;margin-bottom:12px;border-bottom:1px solid rgba(135,71,91,.16);font-size:16px;font-weight:700;letter-spacing:.01em}
+.tpCategoryPanelHeading span{font-size:12px;font-weight:500;opacity:.65}
+.tpCategoryGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 14px}
+.tpCategoryGrid a{display:flex!important;align-items:center;justify-content:space-between;gap:12px;padding:12px 13px!important;border-radius:10px;text-decoration:none!important;color:inherit!important;font-size:14px!important;line-height:1.4;white-space:normal;transition:background .18s,color .18s}
+.tpCategoryGrid a:hover,.tpCategoryGrid a[aria-current=page]{background:rgba(126,39,67,.10);color:#a54b69!important}
+.tpCategoryGrid a svg{flex-shrink:0;opacity:.5}
+@media(max-width:900px){.tpDesktopNav .tpCategoryDropdown{display:none}}
+@media(max-width:650px){.tpCategoryGrid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.tpCategoryPanel,.tpCategoryTrigger svg{transition:none}}
