@@ -13,7 +13,9 @@ import {translateProductName} from '../lib/category-labels';
 export function Header(){
   const [open,setOpen]=useState(false);const languageMenu=useRef<HTMLDetailsElement>(null);const pathname=usePathname();const params=useSearchParams();const {cartCount,wishlist}=useStore();
   const {lang,theme,setLang,setTheme,t}=usePreferences();const {categories}=useCatalog();
-  const nav=[{name:t('new'),href:'/shop',category:'all'},...categories.slice(0,4).map(c=>({name:c.name,href:'/shop?category='+encodeURIComponent(c.slug),category:c.slug})),{name:'SALE',href:'/shop?category=sale',category:'sale'}];
+  const categoryNav=categories.map(c=>({name:c.name,href:'/shop?category='+encodeURIComponent(c.slug),category:c.slug}));
+  const nav=[{name:t('new'),href:'/shop',category:'all'},...categoryNav,{name:'SALE',href:'/shop?category=sale',category:'sale'}];
+  const categoryMenuLabel=lang==='ka'?'კატეგორიები':lang==='ru'?'Категории':'Categories';
   const currentCategory=params.get('category')||'all';const active=(key:string)=>['/','/shop'].includes(pathname)&&(currentCategory===key||(currentCategory==='new'&&key==='all'));
   useEffect(()=>setOpen(false),[pathname]);
   useEffect(()=>{if(!open)return;const close=(e:KeyboardEvent)=>{if(e.key==='Escape')setOpen(false)};
@@ -24,7 +26,7 @@ export function Header(){
     <header className="header">
       <button aria-label={t('menu')} aria-expanded={open} aria-controls="store-menu" className="icon mobile" onClick={()=>setOpen(true)}><Menu/></button>
       <Link href="/" className="brand" aria-label={'Topuria Premium — '+t('home')}><b>TOPURIA</b><small>PREMIUM</small></Link>
-      <nav aria-label={t('collections')}>{nav.map(n=><Link key={n.href} href={n.href} aria-current={active(n.category)?'page':undefined}>{n.name}</Link>)}</nav>
+      <nav aria-label={t('collections')} className="tpDesktopNav"><Link href="/shop" aria-current={active('all')?'page':undefined}>{t('new')}</Link><div className="tpCategoryDropdown"><button type="button" className="tpCategoryTrigger" aria-haspopup="true" aria-label={categoryMenuLabel}>{categoryMenuLabel}<ChevronDown size={15}/></button><div className="tpCategoryPanel" aria-label={categoryMenuLabel}><div className="tpCategoryPanelHeading">{categoryMenuLabel}<span>{categoryNav.length}</span></div><div className="tpCategoryGrid">{categoryNav.map(n=><Link key={n.href} href={n.href} aria-current={active(n.category)?'page':undefined}>{n.name}<ArrowRight size={14}/></Link>)}</div></div></div><Link href="/shop?category=sale" aria-current={active('sale')?'page':undefined}>SALE</Link></nav>
       <div className="actions"><details ref={languageMenu} className="tpLanguageMenu" style={{position:'relative',zIndex:60}}>
         <summary aria-label={t('language')} title={t('language')} style={{display:'flex',alignItems:'center',gap:7,cursor:'pointer',listStyle:'none',padding:'8px 10px',border:'1px solid #d8c8c9',borderRadius:20,fontSize:17}}>
           <span aria-hidden="true">{lang==='ka'?'🇬🇪':lang==='en'?'🇬🇧':'🇷🇺'}</span><ChevronDown size={13}/>
