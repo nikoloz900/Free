@@ -17,4 +17,4 @@ export function track(type:'page_view'|'product_view'|'add_to_cart',productSlug?
       body:JSON.stringify({type,path:location.pathname,productSlug,sessionId,source,device:matchMedia('(max-width: 767px)').matches?'Mobile':'Desktop'})}).catch(()=>{});
   }catch{/* Analytics must never block shopping when storage is unavailable. */}
 }
-export function AnalyticsTracker(){const path=usePathname();useEffect(()=>{if(!path.startsWith('/admin'))track('page_view')},[path]);return null}
+export function AnalyticsTracker(){const path=usePathname();useEffect(()=>{if(!path.startsWith('/tpmgmt'))track('page_view')},[path]);return null}

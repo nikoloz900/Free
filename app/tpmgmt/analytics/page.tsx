@@ -7,11 +7,11 @@ import {money} from '../../../lib/format';
 import AdminNav from '../_nav';
 import RevenueChart from '../revenue-chart';
 export default async function Analytics({searchParams}:{searchParams:Promise<{days?:string}>}){
-  const admin=await getAdmin();if(!admin)redirect('/admin/login');if(admin.role!=='ADMIN'&&!admin.viewStatistics)redirect('/admin/dashboard');
+  const admin=await getAdmin();if(!admin)redirect('/tpmgmt/login');if(admin.role!=='ADMIN'&&!admin.viewStatistics)redirect('/tpmgmt/dashboard');
   const sp=await searchParams;const days=sp.days==='7'?7:sp.days==='90'?90:30;const m=await getMetrics(days);
   const kpis=[{label:'ვიზიტის სესიები',value:m.sessions,note:'უნიკალური სესიები',icon:Users},{label:'პროდუქტის ნახვები',value:m.productViews,note:m.cartAdds+' კალათაში დამატება',icon:MousePointer},
     {label:'საშუალო შეკვეთა',value:money(m.averageOrder),note:m.validOrders+' გაუუქმებელი შეკვეთა',icon:ShoppingCart},{label:'ჩაბარებული გაყიდვები',value:money(m.revenue),note:admin.viewCost?'მოგება: '+money(m.profit):'ჩაბარებული შეკვეთები',icon:Wallet}];
-  return <main className="dash"><AdminNav active="analytics" admin={admin}/><section><div className="dashTop"><div><p>სამუშაო სივრცე / ანალიტიკა</p><h1>ანალიტიკა</h1><span className="adminSubtitle">რეალური ვიზიტები და გაყიდვები.</span></div><nav className="dateTabs">{[7,30,90].map(d=><Link key={d} className={days===d?'active':''} href={'/admin/analytics?days='+d}>{d} დღე</Link>)}</nav></div>
+  return <main className="dash"><AdminNav active="analytics" admin={admin}/><section><div className="dashTop"><div><p>სამუშაო სივრცე / ანალიტიკა</p><h1>ანალიტიკა</h1><span className="adminSubtitle">რეალური ვიზიტები და გაყიდვები.</span></div><nav className="dateTabs">{[7,30,90].map(d=><Link key={d} className={days===d?'active':''} href={'/tpmgmt/analytics?days='+d}>{d} დღე</Link>)}</nav></div>
     <div className="kpis">{kpis.map((k,i)=><article key={k.label}><div className="kpiHead"><span>{k.label}</span><span className={'kpiIcon tone'+i}><k.icon size={20}/></span></div><b>{k.value}</b><small>{k.note}</small></article>)}</div>
     <article className="adminPanel ordersPanel"><div className="panelHeading"><h2>გაყიდვების დინამიკა</h2><small>შეკვეთის შექმნის თარიღით · UTC</small></div><RevenueChart daily={m.daily}/></article>
     <div className="dashGrid"><article className="adminPanel"><div className="panelHeading"><h2>გაყიდვადი პროდუქტები</h2><small>ჩაბარებული შეკვეთებიდან</small></div>{m.topProducts.length?m.topProducts.map((p,i)=><div className="topProductRow" key={p.id}><span className="rank">0{i+1}</span><span>{p.name}<small>{p.quantity} გაყიდული ერთეული</small></span><b>{money(p.total)}</b></div>):<p className="adminEmpty">ჩაბარებული გაყიდვები ჯერ არ არის.</p>}</article>

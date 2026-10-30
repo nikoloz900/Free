@@ -71,7 +71,7 @@ test('Permissions, origin checks, validation and password hashes stay protected'
   const operator=await db.adminUser.findUniqueOrThrow({where:{email:'operator@v7.test'}});
   const changed=await request('/api/admin/users','PATCH',{id:operator.id,key:'exportCsv',value:true},ownerCookie);
   assert.equal(changed.status,200);assert.equal('passwordHash' in await changed.json(),false);
-  assert.equal((await request('/admin/analytics','GET',undefined,operatorCookie)).status,307);
+  assert.equal((await request('/tpmgmt/analytics','GET',undefined,operatorCookie)).status,307);
   assert.equal((await request('/api/admin/cloudinary-sign','POST',{paramsToSign:{timestamp:Math.floor(Date.now()/1000),folder:'other-folder'}},ownerCookie)).status,400);
   assert.equal((await request('/api/admin/cloudinary-sign','POST',{})).status,401);
   const signed=await request('/api/admin/cloudinary-sign','POST',{paramsToSign:{timestamp:Math.floor(Date.now()/1000),folder:'topuria-premium/products'}},ownerCookie);
@@ -146,7 +146,7 @@ test('Analytics revenue excludes cancelled and unfulfilled orders, uses stored e
   const {getMetrics}=await import('../lib/metrics');const m=await getMetrics(7);
   assert.equal(m.revenue,200);assert.equal(m.profit,120);assert.equal(m.validOrders,2);assert.equal(m.cancelled,1);assert.equal(m.sessions,1);assert.equal(m.viewSessions,1);assert.equal(m.cartSessions,1);
   assert.equal(m.topProducts[0].quantity,1);assert.equal(m.daily.reduce((n,d)=>n+d.revenue,0),200);
-  for(const path of ['/admin/dashboard','/admin/analytics','/admin/orders','/admin/users','/admin/customers','/admin/products','/admin/categories']){
+  for(const path of ['/admin/dashboard','/tpmgmt/analytics','/admin/orders','/admin/users','/admin/customers','/admin/products','/admin/categories']){
     const r=await request(path,'GET',undefined,ownerCookie);assert.equal(r.status,200,path);
   }
   assert.equal((await request('/api/admin/products?id='+activeId,'DELETE',undefined,ownerCookie)).status,409);

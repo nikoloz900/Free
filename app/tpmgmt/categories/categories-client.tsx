@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {adminRequest,adminJson,toSlug} from '../../../lib/admin-client';
+import {adminRequest,adminJson,toSlug} from '../../../lib/tpmgmt-client';
 import {translateCategoryName} from '../../../lib/category-labels';
 type Translations=Partial<Record<'ka'|'en'|'ru',string>>;
 type Cat={id:number;name:string;slug:string;description:string;active:boolean;sortOrder:number;translations:Translations};
