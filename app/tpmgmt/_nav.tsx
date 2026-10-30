@@ -1,5 +1,5 @@
 import type {AdminUser} from '@prisma/client';
-import AdminChrome from './tpmgmt-chrome';
+import AdminChrome from './admin-chrome';
 export default function AdminNav({active,admin}:{active:string;admin:AdminUser}){
   const links=[{id:'dashboard',label:'მთავარი',href:'/tpmgmt/dashboard'},
     ...(admin.role==='ADMIN'?[{id:'categories',label:'კატეგორიები',href:'/tpmgmt/categories'}]:[]),
