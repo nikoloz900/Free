@@ -65,3 +65,21 @@
  .v7Store.directCatalog .drawer{padding-left:18px!important;padding-right:18px!important}
  .v7Store.directCatalog .drawer > a{min-height:44px;padding:10px 2px!important;font-size:14px!important}
 }
+
+/* Accessible, theme-independent contrast for the category dropdown.
+   The storefront themes do not define --bg/--text, so inherited dark header
+   colors previously made the menu labels unreadable. */
+.v7Store .tpCategoryPanel{
+  background:#fffaf8!important;
+  color:#251b20!important;
+  border-color:#d8c7cc!important;
+  color-scheme:light;
+}
+.v7Store .tpCategoryPanelHeading{color:#251b20!important}
+.v7Store .tpCategoryPanelHeading span{color:#68565d!important;opacity:1}
+.v7Store .tpCategoryGrid a,
+.v7Store .tpCategoryGrid a:visited{color:#302329!important;opacity:1!important}
+.v7Store .tpCategoryGrid a:hover,
+.v7Store .tpCategoryGrid a:focus-visible,
+.v7Store .tpCategoryGrid a[aria-current=page]{background:#f3e5e9!important;color:#792d47!important}
+.v7Store .tpCategoryGrid a svg{color:currentColor;opacity:.7}
