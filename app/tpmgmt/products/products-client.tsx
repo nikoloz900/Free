@@ -3,7 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import {useSearchParams} from 'next/navigation';
 import {Plus,Search,LayoutGrid,List,X,ImagePlus,Pencil,Package,Trash2} from 'lucide-react';
-import {adminRequest,adminJson,toSlug} from '../../../lib/tpmgmt-client';
+import {adminRequest,adminJson,toSlug} from '../../../lib/admin-client';
 import {money} from '../../../lib/format';
 import {prepareProductImage} from '../../../lib/product-image';
 type Product={id:number;name:string;slug:string;sku:string;category:string;description:string;imageUrl:string;sizes:string;colors:string;price:number;salePrice:number|null;cost?:number;stock:number;sizeStock:Record<string,number>|null;status:string;updatedAt:string};

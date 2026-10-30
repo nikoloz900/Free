@@ -1,7 +1,7 @@
 'use client';
 import {useState} from 'react';
-import {adminRequest,adminJson} from '../../../lib/tpmgmt-client';
-import type {ManagedUser} from '../../../lib/tpmgmt-users';
+import {adminRequest,adminJson} from '../../../lib/admin-client';
+import type {ManagedUser} from '../../../lib/admin-users';
 const perms=[['manageOrders','შეკვეთების მართვა'],['manageCustomers','კლიენტების ნახვა'],['viewStatistics','ანალიტიკა'],['viewCost','თვითღირებულება'],['deleteProducts','პროდუქტის წაშლა'],['exportCsv','ექსპორტი'],['manageUsers','ოპერატორების მართვა']] as const;
 const empty={name:'',email:'',password:''};
 export default function UsersClient({initial,currentId}:{initial:ManagedUser[];currentId:number}){

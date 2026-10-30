@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {adminRequest,adminJson} from '../../../lib/tpmgmt-client';
-import type {AdminPaymentSummary} from '../../../lib/tpmgmt-payments';
+import {adminRequest,adminJson} from '../../../lib/admin-client';
+import type {AdminPaymentSummary} from '../../../lib/admin-payments';
 import {money} from '../../../lib/format';
 
 type Item={id:number;name:string;price:number;quantity:number;size:string|null;color:string|null};
