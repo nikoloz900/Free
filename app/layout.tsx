@@ -14,6 +14,7 @@ export const metadata: Metadata={
  title:{default:'Topuria Premium | ქალის ტანსაცმლის ონლაინ მაღაზია',template:'%s | Topuria Premium'},
  description:'აღმოაჩინეთ Topuria Premium-ის ქალის ტანსაცმლის კოლექციები — ელეგანტური კაბები, კოსტიუმები, პერანგები და მოდური სამოსი. შეარჩიეთ თქვენი სტილი ონლაინ.',
  applicationName:'Topuria Premium',
+ icons:{icon:[{url:'/icon.svg',type:'image/svg+xml'}],shortcut:'/icon.svg'},
  verification:{google:'s312rjxhYJMLI4YdbPcKShlMOXL3ZSngGBFZhYO8YeI'},
  alternates:{canonical:'/'},
  openGraph:{type:'website',locale:'ka_GE',siteName:'Topuria Premium',url:siteUrl,title:'Topuria Premium | ქალის ტანსაცმლის ონლაინ მაღაზია',description:'ქალის ტანსაცმლის გამორჩეული კოლექციები — კაბები, კოსტიუმები, პერანგები და თანამედროვე სტილი.'},
