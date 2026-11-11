@@ -136,3 +136,42 @@
 @media(max-width:1100px){.checkoutGrid{gap:35px;grid-template-columns:minmax(0,1fr) minmax(290px,.85fr)}.checkoutMethods{grid-template-columns:1fr}.checkoutHeading{gap:22px}.checkoutSteps{gap:8px}.checkoutSteps>i{width:15px}.checkoutSummary{padding:22px}}
 @media(max-width:800px){.checkoutShell{padding:10px 24px 65px}.checkoutHeading{margin:28px 0 30px;display:block}.checkoutHeading h1{font-size:24px}.checkoutSteps{margin-top:25px}.checkoutGrid{grid-template-columns:1fr;gap:20px}.checkoutSummary{position:static;padding:25px}.checkoutFields{max-width:none}.checkoutMethods{grid-template-columns:1fr 1fr}.checkoutSection{padding-bottom:25px;margin-bottom:25px}.checkoutResultShell{padding-top:30px}}
 @media(max-width:480px){.checkoutShell{padding:8px 16px 50px}.checkoutTopline{font-size:8px;gap:10px;padding-bottom:20px}.checkoutTopline>span{font-size:8px;gap:5px}.checkoutTopline>span svg{width:11px}.checkoutHeading h1{font-size:22px}.checkoutInputGrid{grid-template-columns:1fr;gap:17px}.checkoutInputGrid input{font-size:16px;padding:13px}.checkoutSectionHeading h2{font-size:12px}.checkoutMethods{gap:9px}.checkoutMethod{padding:15px 11px;gap:8px;align-items:flex-start}.checkoutMethodIcon{flex-basis:100%;place-items:start}.checkoutMethodCopy b{font-size:10px}.checkoutMethodCopy small{font-size:8px}.checkoutMethod>em{margin-left:0;font-size:7px}.checkoutMethodIcon>svg{width:21px;height:21px}.checkoutDelivery>label:not(.checkoutAddress){padding:15px 11px;gap:9px}.checkoutDelivery>label>svg{display:none}.checkoutDelivery small{font-size:8px}.checkoutSummary{padding:20px}.checkoutProduct{gap:10px;grid-template-columns:49px minmax(0,1fr) auto}.checkoutProduct .fashion{width:49px;height:65px}.checkoutProduct b{font-size:9px}.checkoutProduct>span{font-size:9px}.checkoutResume{align-items:stretch;flex-direction:column;gap:15px;padding:16px}.checkoutResume .checkoutSecondary{width:100%}.checkoutResultShell{padding:25px 16px 55px}.checkoutResultCard{padding:28px 20px}.checkoutResultCard h1{font-size:21px}.checkoutResultCard>p{font-size:10px}.checkoutReceipt>div{font-size:9px}.checkoutResultSecurity{font-size:7px;gap:6px}.checkoutBrands{gap:12px}.cartUnavailableImage{width:95px;height:135px}.checkoutSteps{font-size:8px}.checkoutSteps>span,.checkoutSteps>b{gap:6px}.checkoutSteps>i{width:22px}}
+
+
+/* Topuria Premium — enhanced payment selector (presentation only) */
+.checkoutPage .checkoutMethods{gap:14px}
+.checkoutPage .checkoutMethod{min-height:125px;padding:18px;border-radius:17px;background:linear-gradient(145deg,#fff,#fdf9f8);border:1px solid #e9dfe0;box-shadow:0 5px 17px rgba(58,25,34,.035);align-items:flex-start;flex-wrap:nowrap;gap:13px;transition:transform .2s,border-color .2s,box-shadow .2s,background .2s}
+.checkoutPage .checkoutMethod:hover:not(.unavailable){transform:translateY(-2px);border-color:#b98595;box-shadow:0 12px 25px rgba(91,27,43,.09)}
+.checkoutPage .checkoutMethod.selected:not(.unavailable){background:linear-gradient(140deg,#fff9f9,#fff);border:2px solid #702638;padding:17px;box-shadow:0 10px 24px rgba(112,38,56,.12)}
+.checkoutPage .checkoutMethod.unavailable{background:#f6f4f3;opacity:.68;cursor:not-allowed}
+.checkoutPage .checkoutMethodIcon{height:42px;width:42px;min-width:42px;border-radius:13px;background:#f4e8eb;color:#702638}
+.checkoutPage .checkoutMethodIcon--bnpl,.checkoutPage .checkoutMethodIcon--bog_loan{background:#fff0e9;color:#f36526}
+.checkoutPage .checkoutMethodIcon--apple_pay{background:#222;color:#fff}
+.checkoutPage .checkoutMethodCopy b{font-size:12px;font-weight:650;line-height:1.4}
+.checkoutPage .checkoutMethodCopy small{font-size:10px;line-height:1.55;margin-top:6px}
+.checkoutPage .checkoutRadio{margin-top:3px;width:17px;height:17px;border:2px solid #d9bfc7}
+.checkoutPage .checkoutRadio>span{width:9px;height:9px}
+.checkoutPage .checkoutMethod>em{margin:0;position:absolute;right:14px;bottom:12px;font-size:9px}
+.checkoutCardNetworks{display:flex;gap:11px;align-items:center;margin-top:13px}
+.checkoutPage .checkoutVisa{font:italic 800 15px Arial,sans-serif;color:#1644a1;letter-spacing:-.7px}
+.checkoutMastercard,.checkoutBrandMastercard{display:inline-flex;align-items:center;position:relative;height:21px;gap:0}
+.checkoutMastercard>i,.checkoutBrandMastercard>i{width:18px;height:18px;border-radius:50%;background:#e94328;display:block}
+.checkoutMastercard>i:nth-child(2),.checkoutBrandMastercard>i:nth-child(2){margin-left:-7px;background:#f7ad2c;opacity:.95}
+.checkoutMastercard>span{font:500 8px Arial,sans-serif;letter-spacing:-.25px;margin-left:5px;color:#50474a}
+.checkoutBogBrand{display:flex;align-items:center;gap:7px;color:#765d55;font-size:9px;margin-top:13px}
+.checkoutBogMark,.checkoutBrandBog>span{display:inline-flex;align-items:center;justify-content:center;padding:4px 5px;background:#ff6022;color:white;border-radius:5px;font:bold 10px Arial,sans-serif;letter-spacing:-.5px}
+.checkoutPage .checkoutBrands{border:0;margin-top:24px;padding:17px 12px;border-radius:14px;background:#fff;box-shadow:0 3px 17px rgba(47,27,32,.055);gap:12px}
+.checkoutBrands .checkoutBrandSecure{display:flex;align-items:center;gap:5px;color:#567963;font-size:9px}
+.checkoutBrands .checkoutBrandMastercard>span{display:none}
+.checkoutBrands .checkoutApplePay{font:600 12px Arial,sans-serif;color:#262326}
+.checkoutBrands .checkoutBrandBog{display:flex;align-items:center;gap:6px;font-size:9px}
+.checkoutPage .checkoutPrimary{border-radius:12px;background:linear-gradient(100deg,#702638,#922d49);font-weight:600;font-size:13px;box-shadow:0 8px 19px rgba(112,38,56,.15)}
+.checkoutPage .checkoutPrimary:hover:not(:disabled){background:linear-gradient(100deg,#5b1b2b,#7e263e)}
+.checkoutPage .checkoutPrimary:disabled{background:#c6c2be;box-shadow:none}
+:root[data-theme=dark] .checkoutPage .checkoutMethod{background:#282327;border-color:#554047}
+:root[data-theme=dark] .checkoutPage .checkoutMethod.selected:not(.unavailable){background:#37262c;border-color:#cd92a3}
+:root[data-theme=dark] .checkoutPage .checkoutMethod.unavailable{background:#211e1f}
+:root[data-theme=dark] .checkoutPage .checkoutBrands{background:#2a2527}
+:root[data-theme=dark] .checkoutMastercard>span,:root[data-theme=dark] .checkoutBogBrand{color:#d4c5c5}
+:root[data-theme=dark] .checkoutBrands .checkoutApplePay{color:#fff}
+@media(max-width:480px){.checkoutPage .checkoutMethods{grid-template-columns:1fr;gap:11px}.checkoutPage .checkoutMethod{min-height:104px;padding:14px;align-items:center}.checkoutPage .checkoutMethod.selected:not(.unavailable){padding:13px}.checkoutPage .checkoutMethodIcon{flex-basis:auto;place-items:center}.checkoutPage .checkoutBrands{gap:10px}.checkoutPage .checkoutMethodCopy b{font-size:12px}}
